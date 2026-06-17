@@ -23,6 +23,7 @@
   | --- | --- |
   | Frontend | ![React](https://img.shields.io/badge/React-20232A?style=flat-square&logo=react&logoColor=61DAFB) ![TypeScript](https://img.shields.io/badge/TypeScript-3178C6?style=flat-square&logo=typescript&logoColor=white) ![Vite](https://img.shields.io/badge/Vite-646CFF?style=flat-square&logo=vite&logoColor=white) ![Tailwind CSS](https://img.shields.io/badge/Tailwind%20CSS-06B6D4?style=flat-square&logo=tailwindcss&logoColor=white) ![Zustand](https://img.shields.io/badge/Zustand-764ABC?style=flat-square) |
   | Backend | ![Java 21](https://img.shields.io/badge/Java%2021-007396?style=flat-square&logo=openjdk&logoColor=white) ![Spring Boot 3.5](https://img.shields.io/badge/Spring%20Boot%203.5-6DB33F?style=flat-square&logo=springboot&logoColor=white) ![Spring Security](https://img.shields.io/badge/Spring%20Security-6DB33F?style=flat-square&logo=springsecurity&logoColor=white) ![Spring Data JPA](https://img.shields.io/badge/Spring%20Data%20JPA-6DB33F?style=flat-square&logo=spring&logoColor=white) ![Spring Batch](https://img.shields.io/badge/Spring%20Batch-6DB33F?style=flat-square&logo=spring&logoColor=white) ![FastAPI](https://img.shields.io/badge/FastAPI-009688?style=flat-square&logo=fastapi&logoColor=white) ![FastMCP](https://img.shields.io/badge/FastMCP-111827?style=flat-square) |
+  | Test | ![JUnit5](https://img.shields.io/badge/JUnit5-25A162?style=flat-square&logo=junit5&logoColor=white) ![Mockito](https://img.shields.io/badge/Mockito-78A641?style=flat-square) ![JaCoCo](https://img.shields.io/badge/JaCoCo-DC3545?style=flat-square) ![k6](https://img.shields.io/badge/k6-7D64FF?style=flat-square&logo=k6&logoColor=white) |
   | Data / Event | ![PostgreSQL 16](https://img.shields.io/badge/PostgreSQL%2016-4169E1?style=flat-square&logo=postgresql&logoColor=white) ![Redis](https://img.shields.io/badge/Redis-DC382D?style=flat-square&logo=redis&logoColor=white) ![AWS SQS](https://img.shields.io/badge/AWS%20SQS-FF4F8B?style=flat-square&logo=amazonsqs&logoColor=white) |
   | AI / AIOps | ![Python 3.11](https://img.shields.io/badge/Python%203.11-3776AB?style=flat-square&logo=python&logoColor=white) ![PyTorch](https://img.shields.io/badge/PyTorch-EE4C2C?style=flat-square&logo=pytorch&logoColor=white) ![GRU](https://img.shields.io/badge/GRU-7C3AED?style=flat-square) ![vLLM](https://img.shields.io/badge/vLLM-111827?style=flat-square) ![Qwen3-32B](https://img.shields.io/badge/Qwen3--32B-615CED?style=flat-square) ![MCP](https://img.shields.io/badge/MCP-111827?style=flat-square) |
   | Infrastructure | ![AWS](https://img.shields.io/badge/AWS-232F3E?style=flat-square&logo=amazonaws&logoColor=white) ![VMware ESXi](https://img.shields.io/badge/VMware%20ESXi-607078?style=flat-square&logo=vmware&logoColor=white) ![pfSense](https://img.shields.io/badge/pfSense-212121?style=flat-square&logo=pfsense&logoColor=white) ![Kubernetes](https://img.shields.io/badge/Kubernetes-326CE5?style=flat-square&logo=kubernetes&logoColor=white) ![MetalLB](https://img.shields.io/badge/MetalLB-0B7FAB?style=flat-square) ![NGINX Ingress](https://img.shields.io/badge/NGINX%20Ingress-009639?style=flat-square&logo=nginx&logoColor=white) |
@@ -39,13 +40,29 @@
 
 ### 설명
 
-AWS · On-Prem · VESSL AI를 연계한 하이브리드 클라우드 구조입니다.
+AWS · On-Prem · VESSL AI를 Site-to-Site VPN으로 연결한 하이브리드 클라우드 구조입니다.
 
-* **AWS (사용자 접점 · 채널계 · DR)** — 요청은 Route 53 → WAF(Shield·ACM) → CloudFront로 유입되며, 정적 콘텐츠는 S3, 동적 요청은 ALB를 거쳐 EKS로 전달됩니다. EKS는 ap-northeast-2의 두 AZ(A/B) private subnet에 Worker node를 두고 Auto Scaling으로 운영하며, public subnet에는 Bastion host·NAT Gateway를 배치했습니다. RDS는 AZ 간 복제로 이중화하고, 별도 DR Standby(DR RDS)는 KMS로 암호화합니다. DB 자격증명은 Secrets Manager(ASM)로 관리하며 ECR(이미지)·SQS(메시징)를 사용하고, 운영 알림은 CloudWatch → Lambda → SNS로 처리합니다.
-* **On-Prem (핵심 금융 서비스 · 데이터 · 운영, 192.168.0.0/24·10.30.0.0/16)** — VPN Gateway 뒤 pfSense Active/Standby로 경계와 이중화를 구성합니다. Kubernetes 클러스터는 네임스페이스로 Service(백엔드·Cronjob), Observability(Prometheus·kube-state-metrics·AlertManager·OTel Collector), AiOps(KEDA·MCP·예측 모델), CI/CD(ArgoCD 기반 GitOps 배포 · Harbor·Trivy 이미지 스캔)를 분리 배치하고, DaemonSet으로 Fluent-bit·Cilium Agent·Node-exporter를 전 노드에 띄웠습니다. PostgreSQL은 Patroni 물리 복제로 Write/Read를 이중화하고, TrueNAS가 PV 스토리지를, GitLab·Jenkins가 소스·빌드를 담당합니다.
-* **VESSL AI (kr-west)** — vLLM 기반 Qwen3-32B를 서빙해 AIOps의 LLM 추론을 담당합니다.
+**AWS — 사용자 접점 · 채널계 · DR**
 
-AWS VPN Gateway와 On-Prem pfSense를 Site-to-Site VPN으로 연결하고, On-Prem PostgreSQL(Read)을 AWS DMS의 Full-load + CDC로 DR RDS에 복제합니다. 예측 모델이 산출한 트래픽 값은 PostgreSQL에 저장되어 prediction-exporter → Prometheus → KEDA 경로로 예측형 오토스케일링에 활용됩니다.
+* **엣지/보안** : Route 53 → WAF(Shield·ACM) → CloudFront (정적은 S3, 동적은 ALB → EKS)
+* **컴퓨트** : EKS를 두 AZ(A/B) private subnet에 배치, Auto Scaling 운영 / public subnet에 Bastion·NAT Gateway
+* **데이터/DR** : RDS AZ 간 복제 + DR Standby(KMS 암호화), DB 자격증명은 Secrets Manager
+* **부가** : ECR(이미지)·SQS(메시징), 운영 알림은 CloudWatch → Lambda → SNS
+
+**On-Prem — 핵심 금융 서비스 · 데이터 · 운영** (192.168.0.0/24·10.30.0.0/16)
+
+* **경계** : VPN Gateway 뒤 pfSense Active/Standby로 이중화
+* **K8s 네임스페이스** : Service(백엔드·Cronjob) / Observability(Prometheus·kube-state-metrics·AlertManager·OTel) / AiOps(KEDA·MCP·예측 모델) / CI/CD(ArgoCD GitOps · Harbor·Trivy)
+* **DaemonSet** : Fluent-bit·Cilium Agent·Node-exporter
+* **데이터** : PostgreSQL Patroni Write/Read 이중화, TrueNAS PV 스토리지, GitLab·Jenkins 소스·빌드
+
+**VESSL AI (kr-west)** — vLLM 기반 Qwen3-32B를 서빙해 AIOps의 LLM 추론 담당
+
+**하이브리드 연계**
+
+* AWS VPN Gateway ↔ On-Prem pfSense Site-to-Site VPN
+* On-Prem PostgreSQL(Read) → AWS DMS Full-load + CDC → DR RDS
+* 예측값(PostgreSQL) → prediction-exporter → Prometheus → KEDA 예측형 오토스케일링
 
 ---
 
@@ -55,11 +72,13 @@ AWS VPN Gateway와 On-Prem pfSense를 Site-to-Site VPN으로 연결하고, On-Pr
 
 ### 설명
 
-프론트엔드 · API · 백엔드 · 데이터 · AI/오토스케일링 · Observability 계층으로 분리했습니다. 백엔드는 인증·신용·상품/결제·관리·배치로 책임을 나누고, 금융 도메인은 Spring Boot(Java), AIOps·예측 모델은 FastAPI/FastMCP(Python)로 구성한 폴리글랏 구조입니다. 핵심 금융 데이터와 예측 메트릭은 PostgreSQL, 세션·임시 저장·캐시는 Redis에 둡니다.
-
-결제는 SQS 이벤트로 비동기 처리하며, 이벤트 ID 기준 멱등 처리로 한도 차감·주문·원장 기록의 중복 반영을 막고, 배치가 이자·자동 상환·연체를 담당합니다. 예측 모델이 산출한 트래픽 값은 PostgreSQL에 저장되고, prediction-exporter가 이를 메트릭으로 노출하면 Prometheus가 수집해 KEDA가 예측 기반 Scale-out을 수행합니다.
-
-인증/인가(Spring Security·JWT), 검증·예외 처리, OpenTelemetry 분산 트레이싱은 공통 관심사로 분리했고, Prometheus·Loki·Tempo·Alertmanager·Grafana로 메트릭·로그·트레이스·알림을 통합 관측하며, MCP 기반 AIOps가 이를 조회해 장애 원인 후보와 운영 리포트를 생성합니다.
+* **계층 분리** : 프론트엔드 · API · 백엔드 · 데이터 · AI/오토스케일링 · Observability 로 분리. 백엔드는 인증·신용·상품/결제·관리·배치로 책임을 나눔.
+* **폴리글랏** : 금융 도메인은 Spring Boot(Java), AIOps·예측 모델은 FastAPI/FastMCP(Python).
+* **데이터** : 핵심 금융 데이터·예측 메트릭은 PostgreSQL, 세션·임시 저장·캐시는 Redis.
+* **이벤트/배치** : 결제는 SQS 이벤트로 비동기 처리(이벤트 ID 기준 멱등), 배치가 이자·자동 상환·연체를 담당.
+* **예측 스케일링** : 예측값(PostgreSQL) → prediction-exporter → Prometheus → KEDA Scale-out.
+* **공통 관심사** : Spring Security·JWT 인증/인가, 검증·예외 처리, OpenTelemetry 분산 트레이싱.
+* **관측/운영** : Prometheus·Loki·Tempo·Alertmanager·Grafana 통합 관측, MCP 기반 AIOps가 장애 원인 후보(RCA)·운영 리포트 생성.
 
 ---
 
@@ -162,31 +181,69 @@ paymentEventProcessLogRepository.save(PaymentEventProcessLog.processed(
 #### [예측형 오토스케일링]
  
 * 기능 설명 :
-  예측 모델이 미래 요청량을 산출하면 서비스별 처리 용량을 기준으로 필요한 Pod 수를 계산해 PostgreSQL(`prediction_metrics`)에 저장합니다. prediction-exporter가 이를 메트릭으로 노출하면 Prometheus가 수집하고, KEDA가 해당 메트릭을 External Metric으로 읽어 백엔드 replica를 사전 조정합니다. 모델은 Prophet·SARIMA·GRU·LSTM을 동일 조건에서 비교했고, Pod 부족이 곧 장애로 이어지는 특성상 Under-provisioning rate를 기준으로 GRU를 선정했습니다.
+  GRU 예측 모델이 서비스별 미래 요청량을 산출하고, 우선순위 기반 정책으로 필요 Pod 수를 계산해 PostgreSQL ai.prediction_metrics에 저장합니다. KEDA external scaler(GRU)가 이 예측을 트리거로 service-payment·service-core·service-admin Deployment를 사전 Scale-out하며(kkpp 네임스페이스에서 라이브 운영 중), prediction-exporter는 동일 예측값을 Prometheus 메트릭(aiops_predicted_pods 등)으로 노출해 관측합니다.
+  또한 격리 네임스페이스(kkpp-exp-reactive/kkpp-exp-predictive)와 오프라인 시뮬레이션으로 Reactive(현재 RPS 기반 KEDA Prometheus scaler) vs Predictive(GRU external scaler) 를 동일 이미지·리소스·replica cap·부하 조건에서 비교 검증했습니다. (모델은 Prophet·SARIMA·GRU·LSTM 중 Under-provisioning rate 기준으로 GRU 선정)
+
+  **HPA vs KEDA 비교 결과** (동일 부하 조건)
+  | 지표 | HPA (Reactive) | KEDA + GRU (Predictive) | 비교 |
+  | --- | --- | --- | --- |
+  | 최고 RPS | 112 req/s | 91.4 req/s | 약 18.4% 감소 |
+  | P95 최고 지연시간 | 9.70s | 389ms | 96.0% 감소 |
+  | P99 최고 지연시간 | 9.94s | 1.55s | 84.4% 감소 |
+  | 500 에러 발생률 | 순간 100% | 0% | 100%p 감소 |
+
+  → 예측 기반(KEDA+GRU) 스케일링이 트래픽 급증 구간의 지연과 오류를 대폭 줄여, 서비스 안정성을 확보했습니다.
+
+  
 * 핵심 코드(스크립트) :
+
 ```python
-def required_pods(request_rate, policy=DEFAULT_POD_POLICY):
-    values = np.asarray(request_rate, dtype=float)
-    pods = np.ceil(np.maximum(values, 0) / policy.effective_capacity).astype(int)
-    pods = np.clip(pods, policy.min_pods, policy.max_pods)
- 
-    if values.ndim == 0:
-        return int(pods)
- 
-    return pods
+# prediction-exporter: ai.prediction_metrics 최신 예측값을 Prometheus 메트릭으로 노출
+statement = text(
+    """
+    with ranked as (
+        select namespace, service_name, metric_name, predicted_value, target_time,
+               row_number() over (
+                   partition by namespace, service_name, metric_name
+                   order by target_time desc, created_at desc, id desc
+               ) as rn
+        from ai.prediction_metrics
+        where namespace = :namespace and service_name = any(:services)
+    )
+    select service_name, metric_name, predicted_value
+    from ranked where rn = 1
+    """
+)
+# -> aiops_predicted_pods{service="payment",...} 형태로 /metrics 노출
 ```
  
-```yaml
-# TODO: 실제 KEDA ScaledObject 매니페스트로 교체 (Prometheus trigger 기준)
-# apiVersion: keda.sh/v1alpha1
-# kind: ScaledObject ...
+```python
+# 한정된 Pod 예산을 서비스 우선순위(payment>auth>...)로 배분
+allocated = min_pods.copy()
+remaining = pod_budget - min_total
+weighted = {svc: extra_demand[svc] / policies[svc].priority for svc in desired}
+weighted_total = sum(weighted.values())
+for svc, raw_share in raw_shares.items():
+    grant = min(int(np.floor(raw_share)), extra_demand[svc])
+    allocated[svc] += grant
+    remaining -= grant
+```
+ 
+```bash
+# 라이브 KEDA ScaledObject (external trigger = GRU scaler)
+$ kubectl get scaledobject -n kkpp
+NAME                  SCALETARGETNAME   MIN  MAX  READY  ACTIVE  TRIGGERS   AGE
+service-payment-gru   service-payment   1    8    True   True    external   8d
+service-core-gru      service-core      1    6    True   True    external   44h
+service-admin-gru     service-admin     1    3    True   True    external   8d
 ```
  
 * 코드 링크(스크립트 링크) :
-  * `ai-prediction-model/src/models/gru/`
-  * `ai-prediction-model/src/evaluation/pod_policy.py`
+  * `ai-prediction-model/src/exporters/prediction_metrics_exporter.py`
   * `ai-prediction-model/src/evaluation/service_pod_policy.py`
-  * `prophet-autoscaler/`
+  * `ai-prediction-model/src/evaluation/pod_policy.py`
+  * `autoscaling-experiment/` (Reactive vs Predictive 비교 실험)
+  * `autoscaling-experiment/18-offline-scaling-sim.py`
 ---
  
 #### [FastMCP 기반 AIOps Agent]
@@ -196,33 +253,45 @@ def required_pods(request_rate, policy=DEFAULT_POD_POLICY):
 * 핵심 코드(스크립트) :
 ```python
 for tool_plan in plan_result.planned_tools:
-    if not is_read_tool_plan(tool_plan):
-        continue
- 
-    enriched_plan = enrich_tool_plan(
-        tool_plan,
-        incident_key=incident.incident_key
-    )
- 
-    tool_results.append(self._dispatcher.execute(enriched_plan))
+    if not is_read_tool_plan(tool_plan):
+        continue
+
+    enriched_plan = inject_alertmanager_execution_context(
+        tool_plan,
+        incident_key=plan_result.incident_key,
+        incident_window=incident_window,
+    )
+    tool_results.append(self._dispatcher.execute(enriched_plan))
 ```
- 
+
+
+
+
+
 ```python
 tool = resolve_registered_tool(
-    server_name=plan.server_name,
-    tool_name=plan.tool_name,
+    server_name=plan.server_name,
+    tool_name=plan.tool_name,
 )
- 
-permission = McpToolPermission(tool.tool_permission)
-policy = resolve_tool_policy(permission)
-operation = self._resolve_operation(plan.server_name, plan.tool_name)
+policy = resolve_tool_policy(McpToolPermission(tool.tool_permission))
+
+if policy.execution_policy != McpExecutionPolicy.ALLOWED:
+    return build_tool_result(
+        tool=tool,
+        call_status=policy.call_status,
+        response_payload={"message": "Tool execution requires confirmation or approval."},
+    )
 ```
- 
+
+
+
 * 코드 링크(스크립트 링크) :
-  * `mcp-aiops-backend/src/aiops_platform/main.py`
-  * `mcp-aiops-backend/src/aiops_platform/mcp/server.py`
-  * `mcp-aiops-backend/src/aiops_platform/agent/dispatcher.py`
-  * `mcp-aiops-backend/src/aiops_platform/alertmanager_agent/service.py`
+    * `mcp-aiops-backend/src/aiops_platform/main.py`
+    * `mcp-aiops-backend/src/aiops_platform/mcp/server.py`
+    * `mcp-aiops-backend/src/aiops_platform/mcp/policy.py`
+    * `mcp-aiops-backend/src/aiops_platform/mcp/schemas.py`
+    * `mcp-aiops-backend/src/aiops_platform/agent/dispatcher.py`
+    * `mcp-aiops-backend/src/aiops_platform/alertmanager_agent/service.py`
 ---
  
 #### [CQRS 기반 읽기/쓰기 분리 (성능 개선)]
@@ -285,11 +354,11 @@ Optional<CreditReviewApplication> findByPublicIdForUpdate(@Param("publicId") UUI
 ```
  
 * 코드 링크(스크립트 링크) :
-  * `service-admin/src/main/java/com/kkpp/admin/global/config/CoreDataSourceConfig.java`
-  * `service-admin/src/main/java/com/kkpp/admin/global/config/CatalogDataSourceConfig.java`
-  * `service-admin/src/main/java/com/kkpp/admin/credit/service/CreditReviewService.java`
-  * `service-admin/src/main/java/com/kkpp/admin/credit/repository/CreditReviewApplicationRepository.java`
-  * `service-admin/src/main/java/com/kkpp/admin/bnpl/service/BnplAdminService.java`
+  * `back-end/service-admin/src/main/java/com/kkpp/admin/global/config/CoreDataSourceConfig.java`
+  * `back-end/service-admin/src/main/java/com/kkpp/admin/global/config/CatalogDataSourceConfig.java`
+  * `back-end/service-admin/src/main/java/com/kkpp/admin/credit/service/CreditReviewService.java`
+  * `back-end/service-admin/src/main/java/com/kkpp/admin/credit/repository/CreditReviewApplicationRepository.java`
+  * `back-end/service-admin/src/main/java/com/kkpp/admin/bnpl/service/BnplAdminService.java`
 ---
  
 #### [CI/CD 빌드 최적화 (성능 개선)]
@@ -307,16 +376,36 @@ Optional<CreditReviewApplication> findByPublicIdForUpdate(@Param("publicId") UUI
   | 전체 파이프라인 | 5분 27초 | 3분 10초 | 약 42% 단축 |
 * 핵심 코드(스크립트) :
 ```dockerfile
-# TODO: 실제 Dockerfile로 교체
-# 멀티스테이지 + 경량 런타임 베이스 + Spring Boot Layered JAR (의존성/애플리케이션 레이어 분리)
-```
- 
-```groovy
-// TODO: 실제 Jenkinsfile 핵심 stage로 교체
-// Docker 내부 중복 Gradle 빌드 제거 + Layered JAR 패키징 부분 발췌
+FROM python:3.11-slim-bookworm AS builder
+
+ENV PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1 \
+    PIP_NO_CACHE_DIR=1 \
+    PIP_DISABLE_PIP_VERSION_CHECK=1
+
+WORKDIR /app
+
+COPY pyproject.toml README.md ./
+COPY src ./src
+
+RUN python -m pip install --upgrade pip \
+    && python -m pip install --no-compile --target=/app/site-packages .
+
+FROM gcr.io/distroless/python3-debian12:nonroot AS runtime
+
+ENV PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1 \
+    PYTHONPATH="/app/site-packages"
+
+WORKDIR /app
+
+COPY --from=builder --chown=nonroot:nonroot /app/site-packages /app/site-packages
+
+EXPOSE 8000
+
+CMD ["-m", "uvicorn", "aiops_platform.main:app", "--host", "0.0.0.0", "--port", "8000"]
 ```
  
 * 코드 링크(스크립트 링크) :
   * `TODO: Dockerfile 경로`
   * `TODO: Jenkinsfile 경로`
- 
