@@ -38,6 +38,17 @@
 
 ---
 
+## 👥 팀원 소개
+
+| <img src="https://github.com/Federico-15.png" width="90"/> | <img src="https://github.com/HiLeeS.png" width="90"/> | <img src="https://github.com/cuterrabbit.png" width="90"/> | <img src="https://github.com/Zaixian5.png" width="90"/> | <img src="https://github.com/ygreee0320.png" width="90"/> |
+| :---: | :---: | :---: | :---: | :---: |
+| **류승환** | **이승준** | **이동욱** | **사재헌** | **양규리** |
+| [@Federico-15](https://github.com/Federico-15) | [@HiLeeS](https://github.com/HiLeeS) | [@cuterrabbit](https://github.com/cuterrabbit) | [@Zaixian5](https://github.com/Zaixian5) | [@ygreee0320](https://github.com/ygreee0320) |
+| **PM** (AIOps & BE) | **PL** (Observability) | AIOps & Test | 모니터링 & On-prem | CI/CD & Cloud |
+| • SRE Agent 개발<br>• SQS 비동기 처리<br>• 내부 LLM 구축 | • 하이브리드 클라우드 설계<br>• 금융 원장·배치 시스템 구축<br>• Observability 구축 | • AI 예측 모델 개발<br>• Predictive Autoscaling 구축<br>• MCP 기반 AIOps 백엔드 구축<br>• 백엔드 품질 및 배포 안정화 | • 관리자 대시보드 API 개발<br>• DB 이중화 및 HA 구축<br>• 온-프레미스 자원 및 로그 모니터링 구축 | • GitOps 기반 CI/CD 파이프라인 구축<br>• AWS 연동 인프라 구축<br>• 유저 서비스 개발 |
+
+---
+
 ## 2. 아키텍처
 
 ### 2-1. 시스템 아키텍처
@@ -324,23 +335,7 @@ service-admin-gru     service-admin     1    3    True   True    external   8d
   * **eBPF L7 관측** : Cilium(eBPF) CNI + Hubble로 애플리케이션 별도 계측 없이 HTTP 요청량 · 응답시간 관측
   * **하이브리드 수집** : AWS · On-Prem 양쪽 워크로드 지표를 통합 수집
 
-* 핵심 코드(스크립트) :
-```java
-// OpenTelemetry custom span 생성 및 실패 정보 기록
-public Span startSpan(String spanName) {
-    return tracer.spanBuilder(spanName).startSpan();
-}
-
-public void recordException(Span span, Throwable exception) {
-    span.recordException(exception);
-    span.setStatus(StatusCode.ERROR, exception.getMessage());
-}
-```
-
 * 코드 링크(스크립트 링크) :
-  * [`back-end/service-core/src/main/java/com/kkpp/core/global/tracing/TracingSupport.java`](https://github.com/FISA-Agri-Pay/back-end/blob/dev/service-core/src/main/java/com/kkpp/core/global/tracing/TracingSupport.java)
-  * [`back-end/service-catalog/src/main/java/com/kkpp/catalog/global/tracing/TracingSupport.java`](https://github.com/FISA-Agri-Pay/back-end/blob/dev/service-catalog/src/main/java/com/kkpp/catalog/global/tracing/TracingSupport.java)
-  * [`back-end/service-payment/src/main/java/com/kkpp/payment/global/tracing/TracingSupport.java`](https://github.com/FISA-Agri-Pay/back-end/blob/dev/service-payment/src/main/java/com/kkpp/payment/global/tracing/TracingSupport.java)
   * [`infra`](https://github.com/FISA-Agri-Pay/infra) — Observability 구성 <!-- TODO: Helm values / ConfigMap / 대시보드 경로 -->
 ---
 
@@ -564,14 +559,3 @@ CMD ["-m", "uvicorn", "aiops_platform.main:app", "--host", "0.0.0.0", "--port", 
 | [`infra`](https://github.com/FISA-Agri-Pay/infra) | Terraform 기반 IaC 및 운영 스크립트 |
 | [`git-ops`](https://github.com/FISA-Agri-Pay/git-ops) | ArgoCD GitOps 배포 매니페스트 |
 | [`.github`](https://github.com/FISA-Agri-Pay/.github) | 조직 프로필 · 공통 설정 |
-
----
-
-## 5. 팀원 소개
-
-| <img src="https://github.com/Federico-15.png" width="90"/> | <img src="https://github.com/HiLeeS.png" width="90"/> | <img src="https://github.com/cuterrabbit.png" width="90"/> | <img src="https://github.com/Zaixian5.png" width="90"/> | <img src="https://github.com/ygreee0320.png" width="90"/> |
-| :---: | :---: | :---: | :---: | :---: |
-| **류승환** | **이승준** | **이동욱** | **사재헌** | **양규리** |
-| [@Federico-15](https://github.com/Federico-15) | [@HiLeeS](https://github.com/HiLeeS) | [@cuterrabbit](https://github.com/cuterrabbit) | [@Zaixian5](https://github.com/Zaixian5) | [@ygreee0320](https://github.com/ygreee0320) |
-| **PM** (AIOps & BE) | **PL** (Observability) | AIOps & Test | 모니터링 & On-prem | CI/CD & Cloud |
-| • SRE Agent 개발<br> • SQS 비동기 처리<br>• 내부 LLM 구축 | • 하이브리드 클라우드 설계<br>• 금융 원장·배치 시스템 구축<br>• Observability 구축 | • AI 예측 모델 개발<br>• Predictive Autoscaling 구축<br>• MCP 기반 AIOps 백엔드 구축<br>• 백엔드 품질 및 배포 안정화 | • 관리자 대시보드 API 개발<br>• DB 이중화 및 HA 구축<br>• 온-프레미스 자원 및 로그 모니터링 구축 | • GitOps 기반 CI/CD 파이프라인 구축<br>• AWS 연동 인프라 구축<br>• 유저 서비스 개발 |
