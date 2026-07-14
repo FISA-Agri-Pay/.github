@@ -1,40 +1,476 @@
-# 🌾 FISA-Agri-Pay
 
-### 농업 데이터 기반 BNPL 플랫폼 · 시계열 예측 기반 Kubernetes 오토스케일링 & Observability 통합
 
-> **우리FISA 6기 · 클라우드 엔지니어링 과정 3팀**
+<div align="center">
+
+# 콩콩팥팥
+
+
+### 농민을 위한 대안 신용평가 기반 BNPL 플랫폼
+
+농업 데이터를 바탕으로 농민에게 맞춤형 구매 한도를 제공하고,<br />
+시계열 예측 기반 오토스케일링과 통합 관측성을 갖춘 하이브리드 클라우드 시스템입니다.
+
+<br />
+<img src="https://github.com/user-attachments/assets/4912e89b-d402-4029-99f2-00594242ddec" alt="콩콩팥팥 프로젝트 소개" width="300" />
+
+> 우리 FISA 클라우드 엔지니어링 6기 최종 프로젝트 - 데브식스
+</div>
 
 ---
 
-## 1. 프로젝트 개요
+## 📑 목차
 
-* **주제** : 농업 데이터 기반 BNPL 플랫폼 — 시계열 예측 기반 Kubernetes 오토스케일링 및 Observability 통합 시스템 구축
+1. [프로젝트 개요](#-프로젝트-개요)
+2. [대안 신용평가 모델](#-대안-신용평가-모델)
+3. [주요 서비스 기능](#-주요-서비스-기능)
+4. [시스템 아키텍처](#️-시스템-아키텍처)
+5. [인프라 및 기술적 특징](#️-인프라-및-기술적-특징)
+6. [트러블슈팅 & 성능 개선](#-트러블슈팅--성능-개선)
+7. [테스트 및 품질](#-테스트-및-품질)
+8. [팀원 소개](#-팀원-소개)
+9. [리포지토리](#-리포지토리)
+10. [기술 스택](#️-기술-스택)
 
-* **프로젝트 기획 배경** :
+---
 
-  농업인은 영농 주기(파종·생육·수확)에 따라 소득 시점이 달라, 비용은 영농 초기에 먼저 나가지만 수익은 수확 이후 발생하는 **현금흐름 불일치**를 겪습니다. 하지만 기존 금융권은 급여·금융거래 이력 중심으로 평가해 이런 계절성 소득 구조를 반영하기 어렵습니다.
+## 📌 프로젝트 개요
 
-  또한 파종기·수확기·상환일에는 신청·결제·상환 요청이 한 시점에 몰려 **트래픽이 급증**합니다. Reactive 오토스케일링은 트래픽이 늘어난 뒤 Pod를 추가하므로, HPA가 반응하기 전 구간에서 지연·장애가 발생할 수 있습니다.
+### 💡 기획 배경 - 문제 상황
 
-  이에 본 프로젝트는 두 가지를 함께 해결합니다.
+#### 1. 고정 급여가 없어 기존 신용평가만으로 상환 능력을 증명하기 어려움
 
-  * **농업 데이터 기반 대안신용평가 BNPL 서비스** — 농지·작물·보험·상환 이력으로 농업인 맞춤 한도 산정
-  * **Predictive 오토스케일링** — 트래픽을 사전 예측해 Pod를 미리 확보하고, Reactive 방식과 비교 검증
+농민은 일반 근로자와 달리 매월 일정한 급여를 받지 않는 경우가 많아, 소득과 금융 거래 이력을 중심으로 평가하는 기존 신용평가만으로는 실제 상환 능력을 충분히 인정받기 어렵습니다.
 
-  즉, **하이브리드 클라우드 환경에서의 예측 기반 운영 구조 검증**이 본 프로젝트의 핵심입니다.
+#### 2. 농업의 계절성과 영농 활동이 신용평가에 충분히 반영되지 않음
 
-* **기술 스택** :
+농업 소득은 작물의 재배·수확 시기에 따라 크게 달라지며, 경작 면적이나 농작물재해보험 가입 여부와 같은 실제 영농 정보도 기존 금융 데이터에 제대로 기록되지 않아 농민의 신용도를 정확히 평가하기 어렵습니다.
 
-  | 영역 | 기술 스택 |
-  | --- | --- |
-  | Frontend | ![React](https://img.shields.io/badge/React-20232A?style=flat-square&logo=react&logoColor=61DAFB) ![TypeScript](https://img.shields.io/badge/TypeScript-3178C6?style=flat-square&logo=typescript&logoColor=white) ![Vite](https://img.shields.io/badge/Vite-646CFF?style=flat-square&logo=vite&logoColor=white) ![Tailwind CSS](https://img.shields.io/badge/Tailwind%20CSS-06B6D4?style=flat-square&logo=tailwindcss&logoColor=white) ![Zustand](https://img.shields.io/badge/Zustand-764ABC?style=flat-square) |
-  | Backend | ![Java 21](https://img.shields.io/badge/Java%2021-007396?style=flat-square&logo=openjdk&logoColor=white) ![Spring Boot 3.5](https://img.shields.io/badge/Spring%20Boot%203.5-6DB33F?style=flat-square&logo=springboot&logoColor=white) ![Spring Security](https://img.shields.io/badge/Spring%20Security-6DB33F?style=flat-square&logo=springsecurity&logoColor=white) ![Spring Data JPA](https://img.shields.io/badge/Spring%20Data%20JPA-6DB33F?style=flat-square&logo=spring&logoColor=white) ![Spring Batch](https://img.shields.io/badge/Spring%20Batch-6DB33F?style=flat-square&logo=spring&logoColor=white) ![FastAPI](https://img.shields.io/badge/FastAPI-009688?style=flat-square&logo=fastapi&logoColor=white) ![FastMCP](https://img.shields.io/badge/FastMCP-111827?style=flat-square) |
-  | Test | ![JUnit5](https://img.shields.io/badge/JUnit5-25A162?style=flat-square&logo=junit5&logoColor=white) ![Mockito](https://img.shields.io/badge/Mockito-78A641?style=flat-square) ![JaCoCo](https://img.shields.io/badge/JaCoCo-DC3545?style=flat-square) ![k6](https://img.shields.io/badge/k6-7D64FF?style=flat-square&logo=k6&logoColor=white) |
-  | Data / Event | ![PostgreSQL 16](https://img.shields.io/badge/PostgreSQL%2016-4169E1?style=flat-square&logo=postgresql&logoColor=white) ![Redis](https://img.shields.io/badge/Redis-DC382D?style=flat-square&logo=redis&logoColor=white) ![AWS SQS](https://img.shields.io/badge/AWS%20SQS-FF4F8B?style=flat-square&logo=amazonsqs&logoColor=white) |
-  | AI / AIOps | ![Python 3.11](https://img.shields.io/badge/Python%203.11-3776AB?style=flat-square&logo=python&logoColor=white) ![PyTorch](https://img.shields.io/badge/PyTorch-EE4C2C?style=flat-square&logo=pytorch&logoColor=white) ![GRU](https://img.shields.io/badge/GRU-7C3AED?style=flat-square) ![vLLM](https://img.shields.io/badge/vLLM-111827?style=flat-square) ![Qwen3-32B](https://img.shields.io/badge/Qwen3--32B-615CED?style=flat-square) ![MCP](https://img.shields.io/badge/MCP-111827?style=flat-square) |
-  | Infrastructure | ![AWS](https://img.shields.io/badge/AWS-232F3E?style=flat-square&logo=amazonaws&logoColor=white) ![Terraform](https://img.shields.io/badge/Terraform-7B42BC?style=flat-square&logo=terraform&logoColor=white) ![VMware ESXi](https://img.shields.io/badge/VMware%20ESXi-607078?style=flat-square&logo=vmware&logoColor=white) ![pfSense](https://img.shields.io/badge/pfSense-212121?style=flat-square&logo=pfsense&logoColor=white) ![Kubernetes](https://img.shields.io/badge/Kubernetes-326CE5?style=flat-square&logo=kubernetes&logoColor=white) ![MetalLB](https://img.shields.io/badge/MetalLB-0B7FAB?style=flat-square) ![NGINX Ingress](https://img.shields.io/badge/NGINX%20Ingress-009639?style=flat-square&logo=nginx&logoColor=white) |
-  | DevOps | ![Jenkins](https://img.shields.io/badge/Jenkins-D24939?style=flat-square&logo=jenkins&logoColor=white) ![GitHub Actions](https://img.shields.io/badge/GitHub%20Actions-2088FF?style=flat-square&logo=githubactions&logoColor=white) ![Harbor](https://img.shields.io/badge/Harbor-60B932?style=flat-square&logo=harbor&logoColor=white) ![ArgoCD](https://img.shields.io/badge/ArgoCD-EF7B4D?style=flat-square&logo=argo&logoColor=white) ![Docker](https://img.shields.io/badge/Docker-2496ED?style=flat-square&logo=docker&logoColor=white) ![Trivy](https://img.shields.io/badge/Trivy-1904DA?style=flat-square&logo=trivy&logoColor=white) |
-  | Observability | ![Prometheus](https://img.shields.io/badge/Prometheus-E6522C?style=flat-square&logo=prometheus&logoColor=white) ![Grafana](https://img.shields.io/badge/Grafana-F46800?style=flat-square&logo=grafana&logoColor=white) ![Loki](https://img.shields.io/badge/Loki-F46800?style=flat-square&logo=grafana&logoColor=white) ![Tempo](https://img.shields.io/badge/Tempo-F46800?style=flat-square&logo=grafana&logoColor=white) ![Alertmanager](https://img.shields.io/badge/Alertmanager-E6522C?style=flat-square&logo=prometheus&logoColor=white) ![OpenTelemetry](https://img.shields.io/badge/OpenTelemetry-000000?style=flat-square&logo=opentelemetry&logoColor=white) ![Fluent Bit](https://img.shields.io/badge/Fluent%20Bit-49BDA5?style=flat-square&logo=fluentbit&logoColor=white) ![Cilium](https://img.shields.io/badge/Cilium-F8C517?style=flat-square&logo=cilium&logoColor=white) ![Hubble](https://img.shields.io/badge/Hubble-F8C517?style=flat-square) |
+#### 3. 농자재 구매 시점과 수확 소득 발생 시점의 차이로 자금 부담이 발생
+
+농민은 종자, 비료, 농약 등 영농에 필요한 농자재를 수확 전에 구매해야 하지만 소득은 수확 이후에 발생합니다. 이로 인해 영농 초기에 자금 부담이 집중되고, 필요한 시점에 적절한 금융 지원을 받기 어렵습니다.
+
+### 🎯 프로젝트 목표
+
+- **농업 특화 대안 신용평가**: 경작 면적, 농작물재해보험 가입 여부, 주 재배 품목과 상환 행동을 반영해 농민의 신용도를 평가합니다.
+- **농민 전용 BNPL 서비스**: 농자재 구매부터 월별 이자 납부, 원금 상환까지 하나의 흐름으로 제공합니다.
+- **하이브리드 클라우드**: 금융 원장과 민감 데이터는 온프레미스에, 확장성과 접근성이 필요한 서비스는 AWS에 배치합니다.
+- **예측형 운영 자동화**: 과거 트래픽을 학습한 GRU 모델과 KEDA를 결합해 트래픽 증가 전에 리소스를 확장합니다.
+- **AIOps와 통합 관측성**: 로그, 메트릭, 트레이스와 내부 토폴로지를 활용해 장애 원인과 조치 방향을 자동 분석합니다.
+
+
+
+🗓️ 수행 기간
+2026.04.23 ~ 2025.06.17 (9주)
+
+---
+
+## 🧮 대안 신용평가 모델
+
+콩콩팥팥은 신규 가입자의 정적 농업 정보와 서비스 이용 이후의 행동 데이터를 단계적으로 결합합니다.
+
+| 점수 | 평가 시점 | 주요 평가 데이터 | 역할 |
+| --- | --- | --- | --- |
+| **ASS** | 신규 가입 | 농업경영체 등록 기반 경작 면적, 농작물재해보험 가입 여부, 주 재배 품목 | 초기 신용 점수 산정 |
+| **BSS** | 한도 승인 후 | 이자·원금 상환 이력, 연체 및 연체 해소 이력, 한도 사용률 | 월별 행동 점수 산정 |
+| **CSS** | 최종 평가 | 신규 신청자는 ASS, 기존 이용자는 ASS와 BSS를 함께 반영 | 최종 신용 점수와 BNPL 한도 결정 |
+
+### 결제 워크플로
+
+```text
+최초 거래
+ASS 및 CSS 산출
+  -> BNPL 거래 및 월별 이자 납부
+  -> 월별 이자 납부와 연체 현황을 반영해 BSS 산출
+  -> 원금 상환 및 거래 종료
+
+재거래
+ASS와 기존 BSS를 합산해 CSS 갱신
+  -> BNPL 거래 및 월별 이자 납부
+  -> 행동 데이터를 반영해 BSS 갱신
+  -> 원금 상환 및 거래 종료
+```
+
+---
+
+## ✨ 주요 서비스 기능
+
+| 기능 | 설명 |
+| --- | --- |
+| **사용자·인증** | 회원가입, 로그인, 인증과 결제 PIN 검증을 제공합니다. |
+| **대안 신용평가** | 농업 정보와 상환 행동을 바탕으로 신용 점수, 산출 근거와 최종 결과를 제공합니다. |
+| **농민 프로필** | 기본 정보, 작물 종류, 경작 면적과 보험 가입 정보를 관리합니다. |
+| **한도 관리** | 신용평가 결과에 따라 BNPL 한도를 부여하고 사용·잔여 한도를 관리합니다. |
+| **상품 주문·조회** | 농자재 상품을 조회하고 BNPL 주문과 주문 상태를 관리합니다. |
+| **원장 관리** | 대출·이자·연체 원장을 생성하고 상환 내역을 기록합니다. |
+| **상환 및 연체** | 상환 기한에 따라 원금과 이자를 상환하고 연체 발생·해소 이력을 반영합니다. |
+| **관리자 대시보드** | 농민, 한도, 주문, 상환, 연체, 원장과 감사 로그를 통합 조회합니다. |
+| **AIOps** | 운영 데이터로 이상을 탐지하고 LLM 기반 장애 원인 분석과 조치 가이드를 제공합니다. |
+
+### 🎬 서비스 시연 플로우
+
+각 GIF 미리보기를 클릭하면 전체 시연 영상을 확인할 수 있습니다.
+
+#### 👨‍🌾 사용자 측면
+
+| 🧾 한도 신청 | 🛒 농자재 구매 | 💬 유저 챗봇 |
+| :---: | :---: | :---: |
+| <a href="https://github.com/user-attachments/assets/eb8cb241-577c-4730-9182-39fb62b82715"><img src="https://github.com/user-attachments/assets/e2970d53-ae10-4838-a23f-187a537cb5df" alt="사용자 한도 신청 시연" width="260" /></a> | <a href="https://github.com/user-attachments/assets/4456f7fb-66cf-4036-871f-073224e98be2"><img src="https://github.com/user-attachments/assets/d7c5cb5e-c34e-4313-90db-cbf1a624aa82" alt="사용자 농자재 구매 시연" width="260" /></a> | <a href="https://github.com/user-attachments/assets/707d4d3f-d6cc-45f0-816d-070a0c706d6b"><img src="https://github.com/user-attachments/assets/079e8a28-1fe2-4eb2-8059-71e483ce8c4c" alt="사용자 챗봇 시연" width="260" /></a> |
+
+#### 👩‍💼 관리자 측면
+
+| ✅ 한도 승인 | 🚚 배송 관리 | ⚠️ 연체 현황 | 🤖 관리자 챗봇 |
+| :---: | :---: | :---: | :---: |
+| <a href="https://github.com/user-attachments/assets/b009d282-8943-45aa-ae74-42b32a153303"><img src="https://github.com/user-attachments/assets/615850e9-94f2-4a62-8000-76b9cce07bff" alt="관리자 한도 승인 시연" width="220" /></a> | <a href="https://github.com/user-attachments/assets/8570502d-e58a-44f3-b3d5-bee9b9c8499c"><img src="https://github.com/user-attachments/assets/c05d06ff-d89d-4864-b9ff-420eb24cf68a" alt="관리자 배송 관리 시연" width="220" /></a> | <a href="https://github.com/user-attachments/assets/bce8c3a2-f763-49ea-bc4e-a15e3bb30557"><img src="https://github.com/user-attachments/assets/b5bf9391-f03c-42af-9789-8871551f22b7" alt="관리자 연체 현황 시연" width="220" /></a> | <a href="https://github.com/user-attachments/assets/fa1fb090-5d7e-48d5-b49d-d17bdfd32396"><img src="https://github.com/user-attachments/assets/4289822a-77ac-4f52-9667-9fa79df791f5" alt="관리자 챗봇 시연" width="220" /></a> |
+
+---
+
+## 🏗️ 시스템 아키텍처
+
+AWS, 온프레미스 데이터센터와 VESSL AI를 연결한 하이브리드 아키텍처입니다. MSA 서비스는 역할과 데이터 민감도에 따라 AWS EKS와 온프레미스 Kubernetes에 분산하고, Site-to-Site VPN을 통해 사설 통신합니다.
+
+<div align="center">
+  <img src="./docs/images/system-architecture.png" alt="콩콩팥팥 하이브리드 시스템 아키텍처" width="950" />
+</div>
+
+### 영역별 구성
+
+| 영역 | 구성 | 역할 |
+| --- | --- | --- |
+| **AWS Cloud** | Route 53, CloudFront, S3, ALB, EKS, ECR, RDS, DMS, SQS, CloudWatch | 정적 웹 호스팅, 외부 진입점, 확장형 서비스, 비동기 메시지, DR과 클라우드 모니터링 |
+| **온프레미스** | pfSense, HAProxy, Kubernetes, PostgreSQL, Patroni, etcd, TrueNAS | 금융 원장·거래 데이터, 내부 서비스, DB 고가용성과 영구 스토리지 |
+| **VESSL AI** | H100 GPU, vLLM, Qwen3 | 사내 LLM 추론과 AIOps 분석 |
+| **Delivery** | GitLab, Jenkins, Harbor, Trivy, Argo CD | 빌드·검증·이미지 관리와 GitOps 배포 |
+| **Observability** | Prometheus, Grafana, Loki, Tempo, OpenTelemetry, Fluent Bit, Hubble | 로그, 메트릭, 트레이스와 네트워크 흐름 통합 관측 |
+
+### 주요 설계 결정
+
+1. **서비스와 데이터 분리**: 외부 접근과 확장이 필요한 상품·프런트엔드 서비스는 AWS에, 금융 원장과 민감 데이터는 온프레미스에 배치했습니다.
+2. **네트워크 고가용성**: pfSense를 이중화하고 허용된 IP와 포트만 통과시키며, 내부 VLAN은 HAProxy를 통해 라우팅합니다.
+3. **데이터 고가용성**: 온프레미스 PostgreSQL은 Patroni와 etcd 기반 Primary-Replica 구조로 구성하고, 읽기·쓰기를 분리하는 CQRS를 적용했습니다.
+4. **클라우드 DR**: RDS를 이중화하고 DMS Full Load와 CDC로 재해 복구 경로를 구성했습니다.
+5. **비동기 서비스 연계**: 인증, 상품, 결제 서비스 간 이벤트를 AWS SQS로 전달해 결합도를 낮췄습니다.
+
+---
+
+## ☁️ 인프라 및 기술적 특징
+
+### 1️⃣ GRU + KEDA 기반 Predictive Autoscaling
+
+기존 HPA는 CPU·메모리 임계치를 넘은 뒤에야 확장을 시작해 트래픽 급증 시 500 오류와 긴 지연이 발생했습니다. 과거 트래픽으로 학습한 GRU 모델이 향후 RPS를 예측하고, 예측값을 KEDA 외부 메트릭으로 전달해 필요한 Pod를 미리 확보하도록 개선했습니다.
+
+| 지표 | HPA | GRU + KEDA | 개선 |
+| --- | ---: | ---: | ---: |
+| P95 최고 지연 | 9.70s | 389ms | **96.0% 감소** |
+| P99 최고 지연 | 9.94s | 1.55s | **84.4% 감소** |
+| 500 오류 | 발생 | 미발생 | **완전 제거** |
+
+#### 🎬 HPA vs GRU + KEDA 시연 영상
+
+##### HPA — 반응형 오토스케일링
+
+https://github.com/user-attachments/assets/72c94b8f-1ee3-4fe1-a605-4859b15d4d99
+
+##### GRU + KEDA — 예측형 오토스케일링
+
+https://github.com/user-attachments/assets/0484ced5-83cc-4cdc-9110-d9cc4172cc51
+
+### 2️⃣ MCP 기반 AIOps
+
+- 서버 CPU, 메모리, 디스크와 서비스 트래픽을 수집합니다.
+- 시계열 예측 RPS와 실제 트래픽의 차이를 감지합니다.
+- 예측값 초과 시 로그, 메트릭, 트레이스와 내부 토폴로지를 함께 수집합니다.
+- VESSL AI의 Qwen3-32B LLM이 MCP 도구를 통해 필요한 운영 데이터만 조회합니다.
+- 서비스, 네트워크, DB 경로를 시각화하고 근본 원인 후보와 조치 방향을 Slack으로 전달합니다.
+- 민감 정보는 마스킹하고, LLM과 인프라 사이에는 실행 범위를 제한하는 MCP 계층을 둡니다.
+
+### 3️⃣ 통합 관측성과 알림
+
+- **EKS**: CloudWatch로 노드·Pod CPU 및 메모리, 네트워크 트래픽과 오류 지표를 관측합니다.
+- **온프레미스 Kubernetes**: Prometheus 기반 리소스 모니터링과 Hubble 기반 HTTP·TCP·UDP·ICMP 네트워크 흐름을 관측합니다.
+- **PostgreSQL**: 호스트 자원, 쿼리·트랜잭션 처리량, 복제 지연(Replication Lag), 연결 수와 오류 로그를 관측합니다.
+- **pfSense**: 이중화 상태, 자원 사용률, AWS 간 트래픽과 VLAN별 허용·차단 이벤트를 수집합니다.
+- **분산 트레이싱**: OpenTelemetry로 서비스 로그와 트레이스를 연결하고 Tempo·Grafana에서 BNPL 결제 흐름을 추적합니다.
+- **알림**: EKS Pod·Node 이상과 PostgreSQL CPU·메모리·디스크 임계치 초과를 Alertmanager와 Slack으로 전송합니다.
+
+#### 🎬 통합 모니터링 시연 영상
+
+각 GIF 미리보기를 클릭하면 전체 시연 영상을 확인할 수 있습니다.
+
+| 모니터링 영역 | 주요 관측 내용 | 화면 예시 |
+| --- | --- | :---: |
+| ☸️ **온프레미스 Kubernetes** | Prometheus 기반 노드·Pod 자원 사용률과 Hubble 기반 네트워크 흐름을 관측합니다. | <a href="https://github.com/user-attachments/assets/857108f3-8ed4-4993-b7f4-53bdc48fb926"><img src="https://github.com/user-attachments/assets/4da96053-2bee-4ff1-935d-d8f194377f19" alt="온프레미스 Kubernetes 모니터링" width="240" /></a> |
+| 🔥 **pfSense** | 이중화 상태, 자원 사용률, AWS 연결 트래픽과 VLAN별 허용·차단 이벤트를 확인합니다. | <a href="https://github.com/user-attachments/assets/0c1cf486-4297-4ad0-a8e5-e04362c968b5"><img src="https://github.com/user-attachments/assets/0e114ae9-ab9b-4458-8501-bb597806424a" alt="pfSense 모니터링" width="240" /></a> |
+| ☁️ **CloudWatch** | EKS 노드·Pod의 CPU, 메모리, 네트워크 트래픽과 오류 지표를 모니터링합니다. | <a href="https://github.com/user-attachments/assets/b41945bf-04b9-4971-9ee6-263a6d54e093"><img src="https://github.com/user-attachments/assets/e714a085-29fa-4364-a2eb-73c0b5865db9" alt="CloudWatch 모니터링" width="240" /></a> |
+| 🚨 **Alertmanager** | 인프라 임계치 초과와 서비스 이상을 탐지하고 관련 알림을 Slack으로 전달합니다. | <a href="https://github.com/user-attachments/assets/bf7ef90f-8918-43c0-984d-c831cd9a5102"><img src="https://github.com/user-attachments/assets/862d4c61-9c64-40da-8bf0-bf6ad3700da2" alt="Alertmanager 알림" width="240" /></a> |
+| 🔭 **Observability / Trace** | OpenTelemetry와 Tempo를 활용해 서비스 요청 흐름과 BNPL 결제 트레이스를 추적합니다. | <a href="https://github.com/user-attachments/assets/76d5982a-104d-4e62-a70e-8afd41ab1696"><img src="https://github.com/user-attachments/assets/1a15df52-3305-41ac-b658-ab1cb0e66efa" alt="Observability 분산 트레이싱" width="240" /></a> |
+| 🤖 **AIOps — 장애 분석** | 로그·메트릭·트레이스와 토폴로지를 바탕으로 장애 원인 후보를 분석합니다. | <a href="https://github.com/user-attachments/assets/aec04230-9acb-4441-8e24-22f434c584fc"><img src="https://github.com/user-attachments/assets/5517ded6-d8b6-4cb6-aa9f-11daeebc2cb2" alt="AIOps 장애 분석" width="240" /></a> |
+| 🧠 **AIOps — 조치 가이드** | LLM과 MCP를 활용해 운영 상태를 분석하고 장애 대응 및 조치 방향을 제공합니다. | <a href="https://github.com/user-attachments/assets/92df2fc6-2c2b-479b-9663-ccb6d69fe8b3"><img src="https://github.com/user-attachments/assets/7888ad96-8bf1-4107-996b-c3ceb732738c" alt="AIOps 조치 가이드" width="240" /></a> |
+
+### 4️⃣ GitOps 기반 배포와 공급망 보안
+
+```text
+Developer
+  -> GitLab
+  -> Jenkins: Build / Test / Image Build
+  -> Harbor + Trivy: Image Registry / Vulnerability Scan
+  -> GitLab GitOps Repository
+  -> Argo CD
+  -> Kubernetes Services
+```
+
+Harbor에는 온프레미스 이미지를 저장하고 Trivy로 취약점을 검사합니다. AWS 서비스 이미지는 ECR에 저장해 EKS로 배포하며, Argo CD가 GitOps 저장소의 선언 상태와 클러스터 상태를 동기화합니다.
+
+---
+
+## 🔧 트러블슈팅 & 성능 개선
+
+<details>
+<summary><strong>1️⃣ HPA의 사후 확장으로 발생한 500 오류 — 오류 완전 제거</strong></summary>
+
+<br />
+
+#### 문제
+
+급격한 트래픽이 유입됐을 때 실제 트래픽 증가보다 Pod 확장이 늦게 시작됐습니다. 스케일 아웃이 완료될 때까지 요청이 기존 Pod에 집중되면서 500 오류와 높은 응답 지연이 발생했습니다.
+
+#### 원인
+
+기존 HPA는 CPU·메모리 사용률이 임계치를 초과한 이후에 확장을 시작합니다. 이 때문에 갑작스러운 트래픽 변화에 선제적으로 대응하기 어려웠습니다.
+
+#### 해결
+
+과거 트래픽을 학습한 GRU 모델로 향후 RPS를 예측하고, 예측값을 KEDA 외부 메트릭으로 전달했습니다.
+
+KEDA가 실제 트래픽 유입 전에 필요한 Pod를 미리 확보하도록 Predictive Autoscaling 구조를 적용했습니다.
+
+#### 결과
+
+| 지표 | HPA | GRU + KEDA | 개선 |
+| --- | ---: | ---: | ---: |
+| P95 최고 지연 | 9.70s | 389ms | **96.0% 감소** |
+| P99 최고 지연 | 9.94s | 1.55s | **84.4% 감소** |
+| 500 오류 | 발생 | 미발생 | **완전 제거** |
+
+</details>
+
+<details>
+<summary><strong>2️⃣ PostgreSQL 읽기·쓰기 병목 — Dropped Iterations 93.1% 감소</strong></summary>
+
+<br />
+
+#### 문제
+
+PostgreSQL의 읽기와 쓰기 요청이 동일한 경로로 처리되면서 트래픽 증가 시 Primary DB에 부하가 집중됐습니다.
+
+이로 인해 응답 시간이 증가하고 일부 요청이 처리되지 못하는 문제가 발생했습니다.
+
+#### 원인
+
+조회 요청과 데이터 변경 요청이 하나의 DB 인스턴스에 집중됐으며, 읽기 트래픽을 Replica로 분산하지 못했습니다.
+
+#### 해결
+
+읽기와 쓰기 책임을 분리하는 CQRS를 적용하고 Patroni 기반 Primary-Replica 구조와 연계했습니다.
+
+- **Primary**: 데이터 생성·수정·삭제 처리
+- **Replica**: 조회 요청 분산 처리
+- **검증 방법**: k6로 100 RPS를 10분 동안 발생시켜 개선 전후 비교
+
+#### 결과
+
+| 지표 | 적용 전 | 적용 후 | 개선 |
+| --- | ---: | ---: | ---: |
+| 평균 응답 시간 | 50.48ms | 35.60ms | **29.5% 감소** |
+| P95 응답 시간 | 68.05ms | 51.28ms | **24.6% 감소** |
+| 최대 응답 시간 | 4.01s | 1.38s | **65.6% 감소** |
+| Dropped Iterations | 304건 | 21건 | **93.1% 감소** |
+
+</details>
+
+<details>
+<summary><strong>3️⃣ 컨테이너 이미지 비대화와 보안 취약점 — 취약점 100% 제거</strong></summary>
+
+<br />
+
+#### 문제
+
+실행에 필요하지 않은 빌드 도구와 패키지가 최종 이미지에 포함되어 이미지 용량과 ECR 저장 비용이 증가했습니다.
+
+Harbor 이미지에서는 최대 128개의 취약점이 발견됐으며, ECR 이미지에서도 Critical·High·Medium 취약점이 탐지됐습니다.
+
+#### 원인
+
+- 빌드 도구와 실행 환경이 하나의 이미지에 포함됨
+- 취약한 런타임 베이스 이미지 사용
+- 실행 JAR 전체가 하나의 레이어로 복사됨
+- 작은 코드 변경에도 큰 애플리케이션 레이어가 다시 생성됨
+- 의존성과 애플리케이션 코드의 Docker 캐시가 분리되지 않음
+
+#### 해결
+
+경량 런타임 베이스 이미지, Multi-stage Build와 Spring Boot Layered JAR를 적용했습니다.
+
+빌드 환경과 실행 환경을 분리하고, 의존성 레이어와 애플리케이션 레이어를 나눠 Docker 캐시 재사용률을 높였습니다.
+
+#### Harbor 취약점 분석 및 제거
+
+Harbor에 저장된 `service-payment` 이미지를 Trivy로 스캔해 애플리케이션 의존성과 런타임 패키지의 취약점을 단계적으로 제거했습니다.
+
+<div align="center">
+  <img src="./docs/images/harbor-service-payment.png" alt="Harbor service-payment 취약점 제거 결과" width="700" />
+</div>
+
+| 단계 | 이미지 태그 | 이미지 크기 | 크기 변화 | 취약점 | 제거율 |
+| --- | --- | ---: | ---: | ---: | ---: |
+| **최적화 전** | `18a29dc` | 138.36MiB | 기준 | 122개 | 기준 |
+| **1차 최적화** | `aa587b4` | 134.94MiB | 3.42MiB 감소 (2.47%) | 47개 | **61.48% 제거** |
+| **최종 최적화** | `9e51b49` | 119.20MiB | 19.16MiB 감소 (13.85%) | 0개 | **100% 제거** |
+
+#### 분석 및 해결 과정
+
+1. **애플리케이션 의존성 분석**  
+   Tomcat Embed, Spring Security, Netty 등 Java 의존성의 취약 버전을 수정 버전으로 갱신했습니다.
+
+2. **런타임 패키지 분석**  
+   OpenSSL 등 기존 베이스 이미지에 포함된 OS 패키지 취약점을 분리해 확인했습니다.
+
+3. **이미지 구조 개선**  
+   Multi-stage Build와 Spring Boot Layered JAR를 적용해 빌드 도구를 최종 이미지에서 제외했습니다.
+
+4. **경량 런타임 적용**  
+   실행에 필요한 구성만 포함한 경량 베이스 이미지로 교체했습니다.
+
+5. **재스캔 검증**  
+   최종 태그 `9e51b49`를 다시 스캔해 `취약점 없음` 상태를 확인했습니다.
+
+<details>
+<summary><strong>🔍 Trivy 주요 CVE 분석 화면 보기</strong></summary>
+
+<br />
+
+<img src="./docs/images/harbor-cve-analysis.png" alt="Harbor Trivy 주요 CVE 분석" width="900" />
+
+</details>
+
+발표자료의 전체 서비스 종합 지표에서는 이미지별로 최대 128개의 취약점이 탐지됐으며 최종 이미지에서는 모두 0개를 달성했습니다.
+
+위 표의 122개는 첨부 화면에 표시된 `service-payment` 이미지의 개별 측정값입니다.
+
+#### Harbor 전체 최적화 성과
+
+| 지표 | 적용 전 | 적용 후 | 개선 |
+| --- | ---: | ---: | ---: |
+| Harbor 이미지 크기 | 842MB | 694MB | **17.6% 감소** |
+| Harbor 최대 탐지 취약점 | 128개 | 0개 | **100% 제거** |
+| 이미지 레이어 | 48개 | 32개 | **33.3% 감소** |
+| 이미지 빌드 시간 | 3분 41초 | 1분 21초 | **63% 단축** |
+
+#### ECR 이미지 최적화 전후
+
+<table>
+  <tr>
+    <td align="center" width="50%">
+      <strong>최적화 전</strong><br /><br />
+      <img src="./docs/images/ecr-before.png" alt="ECR 이미지 최적화 전" width="360" />
+    </td>
+    <td align="center" width="50%">
+      <strong>최적화 후</strong><br /><br />
+      <img src="./docs/images/ecr-after.png" alt="ECR 이미지 최적화 후" width="360" />
+    </td>
+  </tr>
+</table>
+
+| 비교 항목 | 최적화 전 | 최적화 후 | 분석 |
+| --- | ---: | ---: | --- |
+| **이미지 크기** | 97.11MB | 49.01MB | **48.10MB 감소 (49.53% 절감)** |
+| **Critical 취약점** | 1개 | 0개 | **100% 제거** |
+| **High 취약점** | 3개 | 0개 | **100% 제거** |
+| **Medium 취약점** | 3개 | 0개 | **100% 제거** |
+| **전체 취약점** | 7개 | 0개 | **완전 제거** |
+| **이미지 상태** | 활성 | 활성 | 정상 배포 상태 유지 |
+
+이미지 용량을 절반 가까이 줄여 ECR 저장 공간과 EKS 노드의 이미지 풀(Pull) 부담을 낮췄습니다. 동시에 Critical·High·Medium 취약점을 모두 제거해 배포 효율과 공급망 보안을 개선했습니다.
+
+</details>
+
+<details>
+<summary><strong>4️⃣ Jenkins와 Docker의 중복 빌드 — 전체 파이프라인 42% 단축</strong></summary>
+
+<br />
+
+#### 문제
+
+Jenkins 빌드 이후 Docker 이미지 생성 과정에서 Gradle 빌드를 다시 수행해 동일한 애플리케이션이 중복 빌드됐습니다.
+
+이로 인해 Docker Build와 전체 CI/CD 파이프라인 시간이 불필요하게 증가했습니다.
+
+#### 원인
+
+Jenkins와 Docker가 각각 독립적으로 애플리케이션 빌드를 수행했으며, 의존성 레이어와 애플리케이션 레이어가 분리되지 않아 Docker 캐시를 효율적으로 활용하지 못했습니다.
+
+#### 해결
+
+Jenkins가 생성한 JAR를 Docker가 패키징만 하도록 파이프라인을 변경했습니다.
+
+Spring Boot Layered JAR 구조를 적용하고 변경 빈도가 낮은 의존성 레이어는 Harbor 캐시를 재사용하도록 구성했습니다.
+
+#### 결과
+
+| 구간 | 적용 전 | 적용 후 | 개선 |
+| --- | ---: | ---: | ---: |
+| Build | 32초 | 9초 | **71.9% 단축** |
+| Docker Build & Push | 2분 5초 | 45초 | **64% 단축** |
+| 전체 CI/CD 파이프라인 | 5분 27초 | 3분 10초 | **42% 단축** |
+
+</details>
+
+<details>
+<summary><strong>5️⃣ AIOps LLM의 입력 토큰 낭비 — 입력 토큰 10.17% 감소</strong></summary>
+
+<br />
+
+#### 문제
+
+질문과 직접 관련이 없는 운영 데이터까지 프롬프트에 누적되면서 입력 토큰 사용량과 P95 응답 시간이 증가했습니다.
+
+동일한 운영 데이터를 반복해서 조회해 LLM 요청마다 불필요한 처리 비용도 발생했습니다.
+
+#### 원인
+
+질문의 목적과 관계없이 로그·메트릭·트레이스 등 많은 운영 데이터를 일괄적으로 프롬프트에 포함했습니다.
+
+반복 조회되는 데이터에 캐시가 적용되지 않아 동일한 조회와 전처리가 계속 수행됐습니다.
+
+#### 해결
+
+프롬프트를 응답 목적 중심으로 재구성하고 필요한 운영 데이터만 선택적으로 전달하도록 개선했습니다.
+
+반복 조회되는 운영 데이터에는 30초 TTL 캐시를 적용했습니다.
+
+#### 결과
+
+| 지표 | 최적화 전 | 최적화 후 | 개선 |
+| --- | ---: | ---: | ---: |
+| 평균 응답 시간 | 3.17s | 3.07s | **3.15% 감소** |
+| 요청당 평균 입력 토큰 | 1.18k | 1.06k | **10.17% 감소** |
+| P95 응답 시간 | 8.67s | 8.17s | **5.77% 감소** |
+
+</details>
+
+---
+
+## ✅ 테스트 및 품질
+
+Mockito와 JUnit으로 단위 테스트를 작성하고 JaCoCo로 Instruction 및 Branch Coverage를 측정했습니다. 모든 백엔드 모듈에서 두 지표 모두 90% 이상을 달성했습니다.
+
+| 모듈 | Instruction Coverage | Branch Coverage |
+| --- | ---: | ---: |
+| `service-batch` | 92.73% | 90.25% |
+| `service-core` | 90.16% | 90.45% |
+| `service-admin` | 90.57% | 90.24% |
+| `service-auth` | 95.12% | 100.00% |
+| `service-catalog` | 97.32% | 93.75% |
+| `service-payment` | 93.79% | 92.47% |
 
 ---
 
@@ -44,518 +480,47 @@
 | :---: | :---: | :---: | :---: | :---: |
 | **류승환** | **이승준** | **이동욱** | **사재헌** | **양규리** |
 | [@Federico-15](https://github.com/Federico-15) | [@HiLeeS](https://github.com/HiLeeS) | [@cuterrabbit](https://github.com/cuterrabbit) | [@Zaixian5](https://github.com/Zaixian5) | [@ygreee0320](https://github.com/ygreee0320) |
-| **PM** (AIOps & BE) | **PL** (Observability) | AIOps & Test | 모니터링 & On-prem | CI/CD & Cloud |
-| • SRE Agent 개발<br>• SQS 비동기 처리<br>• 내부 LLM 구축 | • 하이브리드 클라우드 설계<br>• 금융 원장·배치 시스템 구축<br>• Observability 구축 | • AI 예측 모델 개발<br>• Predictive Autoscaling 구축<br>• MCP 기반 AIOps 백엔드 구축<br>• 백엔드 품질 및 배포 안정화 | • 관리자 대시보드 API 개발<br>• DB 이중화 및 HA 구축<br>• 온-프레미스 자원 및 로그 모니터링 구축 | • GitOps 기반 CI/CD 파이프라인 구축<br>• AWS 연동 인프라 구축<br>• 유저 서비스 개발 |
+| **PM** (AIOps & BE) | **PL** (Observability) | AIOps & Test | 모니터링 & 온프레미스 | CI/CD & Cloud |
 
----
+<details>
+<summary><strong>팀원별 상세 담당 업무 보기</strong></summary>
 
-## 2. 아키텍처
+<br />
 
-### 2-1. 시스템 아키텍처
-
-![시스템 아키텍처](../images/system-architecture.png)
-
-#### 설명
-
-AWS · On-Prem · VESSL AI를 연결한 하이브리드 클라우드 구조입니다.
-
-**AWS — 사용자 접점 · 채널계 · DR**
-
-* **외부 진입 · 보안** : Route 53 → WAF(Shield·ACM) → CloudFront. 정적 콘텐츠는 S3, 동적 요청은 ALB를 거쳐 EKS로 전달.
-* **애플리케이션 실행** : EKS를 두 AZ(A/B) private subnet에 배치하고 Auto Scaling으로 운영. public subnet에 Bastion host·NAT Gateway.
-* **데이터 · 재해복구(DR)** : RDS를 AZ 간 복제로 이중화하고 DR Standby는 KMS로 암호화. DB 자격증명은 Secrets Manager로 관리.
-* **배포 · 메시징 · 알림** : ECR(이미지 레지스트리), SQS(메시지 큐), 운영 알림은 CloudWatch → Lambda → SNS.
-
-**On-Prem — 핵심 금융 서비스 · 데이터 · 운영** (192.168.0.0/24 · 10.30.0.0/16)
-
-* **네트워크 경계 · 이중화** : VPN Gateway 뒤 pfSense Active/Standby로 구성.
-* **Kubernetes 클러스터** (네임스페이스로 책임 분리)
-  * Service : 백엔드 서비스 · Cronjob
-  * Observability : Prometheus · kube-state-metrics · AlertManager · OTel Collector
-  * AIOps : KEDA · MCP · 예측 모델
-  * CI/CD : ArgoCD(GitOps) · Harbor · Trivy
-  * DaemonSet(전 노드) : Fluent-bit · Cilium Agent · Node-exporter
-* **데이터 · 스토리지** : PostgreSQL Patroni Write/Read 이중화, TrueNAS PV 스토리지.
-
-**VESSL AI (kr-west)** — vLLM 기반 Qwen3-32B를 서빙해 AIOps의 LLM 추론 담당
-
-**하이브리드 연계**
-
-* AWS VPN Gateway ↔ On-Prem pfSense Site-to-Site VPN
-* On-Prem PostgreSQL(Read) → AWS DMS Full-load + CDC → DR RDS
-* 예측값(PostgreSQL) → prediction-exporter → Prometheus → KEDA 예측형 오토스케일링
-
----
-
-### 2-2. 소프트웨어 아키텍처
-
-![소프트웨어 아키텍처](../images/software-architecture.png)
-
-#### 설명
-
-* **계층 분리** : 프론트엔드 · API · 백엔드 · 데이터 · AI/오토스케일링 · Observability 로 분리. 백엔드는 인증·신용·상품/결제·관리·배치로 책임을 나눔.
-* **도메인별 언어 선택** : 금융 도메인은 Spring Boot(Java), AIOps·예측 모델은 FastAPI/FastMCP(Python).
-* **데이터** : 핵심 금융 데이터·예측 메트릭은 PostgreSQL, 세션·임시 저장·캐시는 Redis.
-* **이벤트/배치** : 결제는 SQS 이벤트로 비동기 처리(이벤트 ID 기준 멱등), 배치가 이자·자동 상환·연체를 담당.
-* **예측 스케일링** : 예측값(PostgreSQL) → prediction-exporter → Prometheus → KEDA Scale-out.
-* **공통 관심사** : Spring Security·JWT 인증/인가, 검증·예외 처리, OpenTelemetry 분산 트레이싱.
-* **관측/운영** : Prometheus·Loki·Tempo·Alertmanager·Grafana 통합 관측, MCP 기반 AIOps가 장애 원인 후보(RCA)·운영 리포트 생성.
-
----
-
-## 3. 주요 기능 소개
-
-### 3-1. 핵심 기술 구성
-
-| 핵심 기술 | 설명 |
+| 팀원 | 담당 업무 |
 | --- | --- |
-| 하이브리드 클라우드 MSA | AWS 채널계(`service-catalog`)와 On-Prem 핵심계(인증·신용·결제) 마이크로서비스를 Site-to-Site VPN으로 연결하고, 금융 데이터 민감도를 기준으로 서비스를 분산 배치. |
-| 고가용성 & 재해복구(DR) | VLAN 망분리와 pfSense Active/Standby(CARP)로 네트워크 경계·이중화를 구성하고, PostgreSQL Patroni HA에 더해 AWS DMS CDC로 On-Prem DB를 RDS에 실시간 복제해 DR 환경을 구성. |
-| 예측형 오토스케일링 | Reactive 방식의 반응 지연을 보완하기 위해, 예측 모델이 미래 트래픽을 PostgreSQL에 저장하면 prediction-exporter → Prometheus를 거쳐 KEDA가 External Metric으로 읽어 Pod를 사전 Scale-out. |
-| 통합 Observability | 하이브리드(AWS·On-Prem)의 메트릭·로그·트레이스·알림을 통합 수집. Cilium(eBPF) CNI로 별도 계측 없이 HTTP 요청량·응답시간을 관측. |
-| FastMCP 기반 AIOps | 메트릭·로그·알림·Kubernetes 조회 등 운영 도구를 MCP Tool로 표준화하고, 장애 발생 시 LLM 기반으로 원인 후보(RCA)와 운영 리포트를 자동 생성. |
-| IaC 기반 인프라 자동화 | Terraform으로 AWS VPC·EKS·RDS·DMS 등 클라우드 리소스를 코드로 프로비저닝해 환경 재현성과 버전 관리를 확보. |
-| GitOps 기반 CI/CD | Jenkins 빌드 → Harbor 레지스트리·Trivy 이미지 스캔 → ArgoCD GitOps 배포로 빌드부터 배포까지 파이프라인을 자동화. |
+| **류승환** | SRE Agent 개발 · SQS 비동기 처리 · 내부 LLM 구축 |
+| **이승준** | 하이브리드 클라우드 설계 · 금융 원장·배치 시스템 구축 · Observability 구축 |
+| **이동욱** | AI 예측 모델 개발 · Predictive Autoscaling 구축 · MCP 기반 AIOps 백엔드 구축 · 백엔드 품질 및 배포 안정화 |
+| **사재헌** | 관리자 대시보드 API 개발 · DB 이중화 및 HA 구축 · 온프레미스 자원 및 로그 모니터링 구축 |
+| **양규리** | GitOps 기반 CI/CD 파이프라인 구축 · AWS 연동 인프라 구축 · 사용자 서비스 개발 |
+
+</details>
 
 ---
+## 🔗 리포지토리
 
-### 3-2. 통합 워크플로우 다이어그램
-
-![통합 워크플로우](../images/workflow.png)
-
+| 영역 | 설명 | 링크 |
+| --- | --- | :---: |
+| 🏢 **Organization** | • 콩콩팥팥 프로젝트의 전체 저장소 관리<br>• 서비스·인프라·GitOps 소스 통합 관리 | [FISA-Agri-Pay](https://github.com/FISA-Agri-Pay) |
+| 🎨 **Frontend** | • React·TypeScript 기반 농민용 사용자 UI<br>• 한도 신청, 농자재 구매, 상환 조회와 사용자 챗봇 | [front-end](https://github.com/FISA-Agri-Pay/front-end) |
+| 🖥️ **Admin Frontend** | • React·TypeScript 기반 관리자 UI<br>• 한도 승인, 배송·연체 현황 관리와 관리자 챗봇 | [front-end-admin](https://github.com/FISA-Agri-Pay/front-end-admin) |
+| ⚙️ **Backend** | • Spring Boot 기반 MSA 백엔드<br>• 인증, 상품, 결제, 원장, 상환, 연체와 배치 처리 | [back-end](https://github.com/FISA-Agri-Pay/back-end) |
+| 📈 **AI Prediction Model** | • PyTorch·GRU 기반 시계열 트래픽 예측 모델<br>• 예측 RPS를 KEDA 외부 메트릭으로 제공해 선제적 오토스케일링 지원 | [ai-prediction-model](https://github.com/FISA-Agri-Pay/ai-prediction-model) |
+| 🤖 **AIOps Backend** | • FastAPI·FastMCP 기반 AIOps 서비스<br>• 운영 데이터 조회, 장애 원인 분석과 조치 가이드 생성 | [mcp-aiops-backend](https://github.com/FISA-Agri-Pay/mcp-aiops-backend) |
+| 🏗️ **Infrastructure / IaC** | • Terraform 기반 AWS 및 온프레미스 인프라 구성<br>• 하이브리드 네트워크, Kubernetes와 데이터 계층 관리 | [infra](https://github.com/FISA-Agri-Pay/infra) |
+| 🚀 **GitOps** | • Kubernetes 배포 매니페스트와 환경별 설정 관리<br>• Argo CD 기반 선언적 배포 및 클러스터 상태 동기화 | [git-ops](https://github.com/FISA-Agri-Pay/git-ops) |
 ---
 
-### 3-3. 세부 기능 소개
+## 🛠️ 기술 스택
 
-#### [농업 데이터 기반 대안신용평가 BNPL]
-
-* 기능 설명 :
-  * **대안신용평가** : 급여·금융거래 이력 대신 농지·작물·보험·상환 이력 등 농업 데이터로 농업인 맞춤 한도를 산정
-  * **신용 심사 워크플로우** : 신청 → 심사 → 승인/한도 부여 → 한도 기반 BNPL 이용
-  * **계절성 반영** : 영농 주기로 인한 현금흐름 불일치를 고려한 한도·상환 설계
-
-* 핵심 코드(스크립트) :
-```java
-// 농지 면적·작물·보험·영농 경력을 조합한 대안신용점수 산정
-BigDecimal estimatedIncome = calculateEstimatedIncome(profile.getFieldAreaM2(), cropType);
-int incomeScore = calculateIncomeScore(estimatedIncome);
-int insuranceScore = calculateInsuranceScore(profile.getHasCropInsurance());
-int farmingCareerScore = calculateFarmingCareerScore(profile);
-int totalScore = incomeScore + insuranceScore + farmingCareerScore;
-
-return new AssScoreResult(
-        estimatedIncome, LocalDate.now(),
-        incomeScore, insuranceScore, farmingCareerScore, totalScore,
-        LocalDateTime.now()
-);
-```
-
-* 코드 링크(스크립트 링크) :
-  * [`back-end/service-core/src/main/java/com/kkpp/core/credit/service/AssScoringService.java`](https://github.com/FISA-Agri-Pay/back-end/blob/dev/service-core/src/main/java/com/kkpp/core/credit/service/AssScoringService.java)
-  * [`back-end/service-core/src/main/java/com/kkpp/core/credit/service/CreditSubmitPersistenceService.java`](https://github.com/FISA-Agri-Pay/back-end/blob/dev/service-core/src/main/java/com/kkpp/core/credit/service/CreditSubmitPersistenceService.java)
-  * [`back-end/service-admin/src/main/java/com/kkpp/admin/credit/service/CreditReviewService.java`](https://github.com/FISA-Agri-Pay/back-end/blob/dev/service-admin/src/main/java/com/kkpp/admin/credit/service/CreditReviewService.java)
----
-
-#### [이벤트 기반 BNPL 결제]
-
-* 기능 설명 :
-  * **이벤트 흐름** : 체크아웃 → 결제 요청 저장 → SQS 발행 → 결제 서비스가 소비해 한도 차감·주문 생성·이용 원장 기록
-  * **멱등 처리** : SQS는 at-least-once 전달이므로, 처리 이력 테이블(`paymentEventProcessLog`)에 이벤트 ID·결제요청 ID를 기록해 동일 결제의 중복 반영을 차단
-  * **분산 추적** : SQS 메시지 attribute에 OpenTelemetry trace context를 실어 보내고 소비 시 복원 → 체크아웃 → SQS → 결제 소비를 end-to-end 추적
-
-* 핵심 코드(스크립트) :
-```java
-// 결제 요청 저장 후 SQS 이벤트 발행
-BnplPaymentRequest paymentRequest = bnplPaymentRequestRepository.saveAndFlush(BnplPaymentRequest.create(
-        paymentRequestPublicId,
-        userPublicId,
-        totalAmount,
-        cartItems
-));
-
-UUID orderPublicId = orderPublicId(paymentRequest.getPublicId());
-
-creditPaymentEventProducer.publish(
-        toEvent(paymentRequest, orderPublicId, cartItems, request.deliveryAddress(), request.idempotencyKey())
-);
-```
-
-```java
-// SQS 메시지 발행 및 trace context 전파
-SendMessageRequest request = SendMessageRequest.builder()
-        .queueUrl(paymentRequestQueueUrl)
-        .messageBody(payload)
-        .messageGroupId(event.userPublicId().toString())
-        .messageDeduplicationId(event.paymentRequestPublicId().toString())
-        .messageAttributes(SqsTraceContext.currentMessageAttributes())
-        .build();
-```
-
-```java
-// 이벤트 소비 시 멱등 처리 + 주문 생성 + 한도 차감 + 이용 원장 기록
-if (paymentEventProcessLogRepository.existsByEventIdOrPaymentRequestPublicId(eventId, paymentRequestPublicId)) {
-    return;
-}
-
-order = orderRepository.save(Order.confirmed(
-        orderPublicId,
-        userPublicId,
-        paymentRequestPublicId,
-        message.totalAmount(),
-        message.deliveryAddress(),
-        message.items(),
-        Objects.requireNonNullElse(message.occurredAt(), LocalDateTime.now())
-));
-
-creditLimit.use(message.totalAmount());
-
-creditUsageLedgerRepository.save(CreditUsageLedger.purchase(
-        creditLimit.getPublicId(),
-        order.getPublicId(),
-        paymentRequestPublicId,
-        message.totalAmount(),
-        usedAt
-));
-
-paymentEventProcessLogRepository.save(PaymentEventProcessLog.processed(
-        eventId,
-        paymentRequestPublicId,
-        message.idempotencyKey()
-));
-```
-
-* 코드 링크(스크립트 링크) :
-  * [`back-end/service-catalog/src/main/java/com/kkpp/catalog/checkout/service/CheckoutService.java`](https://github.com/FISA-Agri-Pay/back-end/blob/dev/service-catalog/src/main/java/com/kkpp/catalog/checkout/service/CheckoutService.java)
-  * [`back-end/service-catalog/src/main/java/com/kkpp/catalog/checkout/event/SqsCreditPaymentEventProducer.java`](https://github.com/FISA-Agri-Pay/back-end/blob/dev/service-catalog/src/main/java/com/kkpp/catalog/checkout/event/SqsCreditPaymentEventProducer.java)
-  * [`back-end/service-payment/src/main/java/com/kkpp/payment/event/SqsCreditPaymentRequestedConsumer.java`](https://github.com/FISA-Agri-Pay/back-end/blob/dev/service-payment/src/main/java/com/kkpp/payment/event/SqsCreditPaymentRequestedConsumer.java)
-  * [`back-end/service-payment/src/main/java/com/kkpp/payment/service/CreditPaymentProcessingService.java`](https://github.com/FISA-Agri-Pay/back-end/blob/dev/service-payment/src/main/java/com/kkpp/payment/service/CreditPaymentProcessingService.java)
-  * [`back-end/service-payment/src/main/java/com/kkpp/payment/domain/PaymentEventProcessLog.java`](https://github.com/FISA-Agri-Pay/back-end/blob/dev/service-payment/src/main/java/com/kkpp/payment/domain/PaymentEventProcessLog.java)
----
-
-#### [배치 처리 (이자·자동 상환·연체)]
-
-* 기능 설명 :
-  * **스케줄 배치** : Spring Batch로 이자 계산 · 자동 상환 · 연체 처리를 주기적으로 실행
-  * **청크 기반 처리** : 대량 상환/원장 데이터를 Chunk(읽기-처리-쓰기) 단위로 나눠 대용량에도 안정적으로 처리
-  * **재처리 안전성** : Job 실행 메타데이터로 중복 실행을 방지하고, 실패 Step만 재시도
-
-* 핵심 코드(스크립트) :
-```java
-// 이자 원장 생성을 100건 단위 Chunk로 분할 처리
-return new StepBuilder("interestChargeMonthlyStep", jobRepository)
-        .<CreditLimit, InterestLedger>chunk(CHUNK_SIZE, transactionManager)
-        .reader(interestChargeMonthlyReader)
-        .processor(interestChargeMonthlyProcessor)
-        .writer(interestChargeMonthlyWriter)
-        .build();
-```
-
-* 코드 링크(스크립트 링크) :
-  * [`back-end/service-batch/src/main/java/com/kkpp/batch/interest/job/InterestChargeMonthlyJobConfig.java`](https://github.com/FISA-Agri-Pay/back-end/blob/dev/service-batch/src/main/java/com/kkpp/batch/interest/job/InterestChargeMonthlyJobConfig.java)
-  * [`back-end/service-batch/src/main/java/com/kkpp/batch/interest/payment/job/InterestAutoPaymentJobConfig.java`](https://github.com/FISA-Agri-Pay/back-end/blob/dev/service-batch/src/main/java/com/kkpp/batch/interest/payment/job/InterestAutoPaymentJobConfig.java)
-  * [`back-end/service-batch/src/main/java/com/kkpp/batch/principal/repayment/job/PrincipalAutoPaymentJobConfig.java`](https://github.com/FISA-Agri-Pay/back-end/blob/dev/service-batch/src/main/java/com/kkpp/batch/principal/repayment/job/PrincipalAutoPaymentJobConfig.java)
-  * [`back-end/service-batch/src/main/java/com/kkpp/batch/overdue/job/OverdueDetectionJobConfig.java`](https://github.com/FISA-Agri-Pay/back-end/blob/dev/service-batch/src/main/java/com/kkpp/batch/overdue/job/OverdueDetectionJobConfig.java)
----
-
-#### [예측형 오토스케일링]
-
-* 기능 설명 :
-  * **예측 → 스케일** : GRU가 서비스별 미래 요청량을 산출하고 우선순위 정책으로 필요 Pod 수를 계산해 PostgreSQL `ai.prediction_metrics`에 저장. KEDA external scaler(GRU)가 이를 트리거로 `service-payment`·`service-core`·`service-admin` Deployment를 사전 Scale-out (`kkpp` 네임스페이스 라이브 운영 중)
-  * **관측** : prediction-exporter가 동일 예측값을 Prometheus 메트릭(`aiops_predicted_pods` 등)으로 노출
-  * **비교 검증** : 격리 네임스페이스 + 오프라인 시뮬레이션으로 Reactive(KEDA Prometheus scaler) vs Predictive(GRU external scaler)를 동일 이미지·리소스·replica cap·부하로 비교 (모델은 Prophet·SARIMA·GRU·LSTM 중 Under-provisioning rate 기준 GRU 선정)
-
-  **HPA vs KEDA 비교 결과** (동일 부하 조건)
-
-  | 지표 | HPA (Reactive) | KEDA + GRU (Predictive) | 비교 |
-  | --- | --- | --- | --- |
-  | 최고 RPS | 112 req/s | 91.4 req/s | 약 18.4% 감소 |
-  | P95 최고 지연시간 | 9.70s | 389ms | 96.0% 감소 |
-  | P99 최고 지연시간 | 9.94s | 1.55s | 84.4% 감소 |
-  | 500 에러 발생률 | 순간 100% | 0% | 100%p 감소 |
-
-  → 예측 기반(KEDA+GRU) 스케일링이 트래픽 급증 구간의 지연과 오류를 대폭 줄여, 서비스 안정성을 확보했습니다.
-
-* 핵심 코드(스크립트) :
-
-```python
-# prediction-exporter: ai.prediction_metrics 최신 예측값을 Prometheus 메트릭으로 노출
-statement = text(
-    """
-    with ranked as (
-        select namespace, service_name, metric_name, predicted_value, target_time,
-               row_number() over (
-                   partition by namespace, service_name, metric_name
-                   order by target_time desc, created_at desc, id desc
-               ) as rn
-        from ai.prediction_metrics
-        where namespace = :namespace and service_name = any(:services)
-    )
-    select service_name, metric_name, predicted_value
-    from ranked where rn = 1
-    """
-)
-# -> aiops_predicted_pods{service="payment",...} 형태로 /metrics 노출
-```
-
-```python
-# 한정된 Pod 예산을 서비스 우선순위(payment>auth>...)로 배분
-allocated = min_pods.copy()
-remaining = pod_budget - min_total
-weighted = {svc: extra_demand[svc] / policies[svc].priority for svc in desired}
-weighted_total = sum(weighted.values())
-for svc, raw_share in raw_shares.items():
-    grant = min(int(np.floor(raw_share)), extra_demand[svc])
-    allocated[svc] += grant
-    remaining -= grant
-```
-
-```bash
-# 라이브 KEDA ScaledObject (external trigger = GRU scaler)
-$ kubectl get scaledobject -n kkpp
-NAME                  SCALETARGETNAME   MIN  MAX  READY  ACTIVE  TRIGGERS   AGE
-service-payment-gru   service-payment   1    8    True   True    external   8d
-service-core-gru      service-core      1    6    True   True    external   44h
-service-admin-gru     service-admin     1    3    True   True    external   8d
-```
-
-* 코드 링크(스크립트 링크) :
-  * [`ai-prediction-model/src/models/gru/train_service.py`](https://github.com/FISA-Agri-Pay/ai-prediction-model/blob/develop/src/models/gru/train_service.py) (서비스별 GRU 학습)
-  * [`ai-prediction-model/src/evaluation/service_pod_policy.py`](https://github.com/FISA-Agri-Pay/ai-prediction-model/blob/develop/src/evaluation/service_pod_policy.py) (우선순위 기반 Pod 배분 정책)
-  * [`ai-prediction-model/src/evaluation/pod_policy.py`](https://github.com/FISA-Agri-Pay/ai-prediction-model/blob/develop/src/evaluation/pod_policy.py) (필요 Pod 산정)
-  * [`ai-prediction-model/src/optimization/autoscaling_score.py`](https://github.com/FISA-Agri-Pay/ai-prediction-model/blob/develop/src/optimization/autoscaling_score.py) (Under-provisioning 기준 모델 평가)
-  * [`ai-prediction-model/experiments/service_autoscaling/`](https://github.com/FISA-Agri-Pay/ai-prediction-model/tree/develop/experiments/service_autoscaling/) (Reactive vs Predictive 비교 실험)
-  * [`ai-prediction-model/docs/onprem-bnpl-autoscaling-design.md`](https://github.com/FISA-Agri-Pay/ai-prediction-model/blob/develop/docs/onprem-bnpl-autoscaling-design.md) (설계 문서)
-  * prediction-exporter(예측값 → Prometheus 노출) : aiops 서빙 레포 <!-- TODO: 실제 경로 -->
----
-
-#### [통합 Observability (LGTM + eBPF)]
-
-* 기능 설명 :
-  * **메트릭·로그·트레이스·알림 통합** : Prometheus(메트릭) · Loki + Fluent-bit(로그) · Tempo + OpenTelemetry(트레이스) · Alertmanager(알림)를 Grafana 단일 대시보드로 통합
-  * **eBPF L7 관측** : Cilium(eBPF) CNI + Hubble로 애플리케이션 별도 계측 없이 HTTP 요청량 · 응답시간 관측
-  * **하이브리드 수집** : AWS · On-Prem 양쪽 워크로드 지표를 통합 수집
-
-* 코드 링크(스크립트 링크) :
-  * [`infra`](https://github.com/FISA-Agri-Pay/infra) — Observability 구성 <!-- TODO: Helm values / ConfigMap / 대시보드 경로 -->
----
-
-#### [FastMCP 기반 AIOps Agent]
-
-* 기능 설명 :
-  * **도구 표준화** : FastAPI/FastMCP 기반 MCP 서버로 Prometheus·Loki·Alertmanager·Kubernetes 조회 도구를 표준화
-  * **자동 RCA** : Alertmanager 알림 발생 시 관련 메트릭·로그를 모아 장애 원인 후보(RCA)와 운영 리포트 초안을 생성
-  * **LLM 추론** : VESSL AI의 vLLM(Qwen3-32B) 사용
-
-* 핵심 코드(스크립트) :
-```python
-for tool_plan in plan_result.planned_tools:
-    if not is_read_tool_plan(tool_plan):
-        continue
-
-    enriched_plan = inject_alertmanager_execution_context(
-        tool_plan,
-        incident_key=plan_result.incident_key,
-        incident_window=incident_window,
-    )
-    tool_results.append(self._dispatcher.execute(enriched_plan))
-```
-
-```python
-tool = resolve_registered_tool(
-    server_name=plan.server_name,
-    tool_name=plan.tool_name,
-)
-policy = resolve_tool_policy(McpToolPermission(tool.tool_permission))
-
-if policy.execution_policy != McpExecutionPolicy.ALLOWED:
-    return build_tool_result(
-        tool=tool,
-        call_status=policy.call_status,
-        response_payload={"message": "Tool execution requires confirmation or approval."},
-    )
-```
-
-* 코드 링크(스크립트 링크) :
-  * [`mcp-aiops-backend/src/aiops_platform/main.py`](https://github.com/FISA-Agri-Pay/mcp-aiops-backend/blob/develop/src/aiops_platform/main.py)
-  * [`mcp-aiops-backend/src/aiops_platform/mcp/server.py`](https://github.com/FISA-Agri-Pay/mcp-aiops-backend/blob/develop/src/aiops_platform/mcp/server.py)
-  * [`mcp-aiops-backend/src/aiops_platform/mcp/policy.py`](https://github.com/FISA-Agri-Pay/mcp-aiops-backend/blob/develop/src/aiops_platform/mcp/policy.py)
-  * [`mcp-aiops-backend/src/aiops_platform/mcp/schemas.py`](https://github.com/FISA-Agri-Pay/mcp-aiops-backend/blob/develop/src/aiops_platform/mcp/schemas.py)
-  * [`mcp-aiops-backend/src/aiops_platform/agent/dispatcher.py`](https://github.com/FISA-Agri-Pay/mcp-aiops-backend/blob/develop/src/aiops_platform/agent/dispatcher.py)
-  * [`mcp-aiops-backend/src/aiops_platform/alertmanager_agent/service.py`](https://github.com/FISA-Agri-Pay/mcp-aiops-backend/blob/develop/src/aiops_platform/alertmanager_agent/service.py)
----
-
-#### [CQRS 기반 읽기/쓰기 분리 (성능 개선)]
-
-* 기능 설명 :
-  * **패턴** : 변경(쓰기)과 조회(읽기)의 모델·책임을 분리하는 CQRS 적용
-  * **DB 분리** : PostgreSQL Primary(쓰기)/Replica(읽기)로 나눠 조회 부하를 Replica로 분산
-  * **검증** : K6 부하 테스트(100 RPS, 10분)로 응답 시간·처리 안정성 개선 확인
-
-  | 지표 | 적용 전 | 적용 후 | 차이 |
-  | --- | --- | --- | --- |
-  | 평균 응답 시간 | 50.48ms | 35.60ms | 29.5% 감소 |
-  | p95 응답 시간 | 68.05ms | 51.28ms | 24.6% 감소 |
-  | 최대 응답 시간 | 4.01s | 1.38s | 65.6% 감소 |
-  | 실패율 | 0% | 0% | - |
-  | Dropped Iterations | 304건 | 21건 | 93.1% 감소 |
-
-* 핵심 코드(스크립트) :
-```java
-// core DB용 Repository / EntityManager / TransactionManager 분리
-@EnableJpaRepositories(
-    basePackages = {
-        "com.kkpp.admin.adminauth.repository",
-        "com.kkpp.admin.bnpl.repository",
-        "com.kkpp.admin.order.repository",
-        "com.kkpp.admin.credit.repository"
-    },
-    entityManagerFactoryRef = "coreEntityManagerFactory",
-    transactionManagerRef = "coreTransactionManager"
-)
-```
-```java
-// 조회 모델: readOnly 트랜잭션 + DTO Projection 조회
-@Transactional(readOnly = true)
-public CreditReviewPageResponse getReviews(CreditReviewStatus status, int page, int size) {
-    Page<CreditReviewSummaryResponse> result =
-            applicationRepository.findReviewSummaries(status, pageable);
-
-    return new CreditReviewPageResponse(
-            result.getContent(),
-            result.getNumber(),
-            result.getSize(),
-            result.getTotalElements(),
-            result.getTotalPages(),
-            result.isFirst(),
-            result.isLast()
-    );
-}
-```
-```java
-// 쓰기 모델: 별도 쓰기 트랜잭션 + 비관적 락
-@Transactional
-public CreditReviewDecisionResponse approve(UUID publicId, ApproveCreditReviewRequest request) {
-    CreditReviewApplication application = getApplicationForUpdate(publicId);
-
-    application.approve(request.reviewedBy(), request.approvedAmount(), decidedAt);
-
-    CreditReviewLimit savedLimit = limitRepository.save(limit);
-}
-
-@Lock(LockModeType.PESSIMISTIC_WRITE)
-@Query("select application from CreditReviewApplication application join fetch application.user where application.publicId = :publicId")
-Optional<CreditReviewApplication> findByPublicIdForUpdate(@Param("publicId") UUID publicId);
-```
-
-* 코드 링크(스크립트 링크) :
-  * [`back-end/service-admin/src/main/java/com/kkpp/admin/global/config/CoreDataSourceConfig.java`](https://github.com/FISA-Agri-Pay/back-end/blob/dev/service-admin/src/main/java/com/kkpp/admin/global/config/CoreDataSourceConfig.java)
-  * [`back-end/service-admin/src/main/java/com/kkpp/admin/global/config/CatalogDataSourceConfig.java`](https://github.com/FISA-Agri-Pay/back-end/blob/dev/service-admin/src/main/java/com/kkpp/admin/global/config/CatalogDataSourceConfig.java)
-  * [`back-end/service-admin/src/main/java/com/kkpp/admin/credit/service/CreditReviewService.java`](https://github.com/FISA-Agri-Pay/back-end/blob/dev/service-admin/src/main/java/com/kkpp/admin/credit/service/CreditReviewService.java)
-  * [`back-end/service-admin/src/main/java/com/kkpp/admin/credit/repository/CreditReviewApplicationRepository.java`](https://github.com/FISA-Agri-Pay/back-end/blob/dev/service-admin/src/main/java/com/kkpp/admin/credit/repository/CreditReviewApplicationRepository.java)
-  * [`back-end/service-admin/src/main/java/com/kkpp/admin/bnpl/service/BnplAdminService.java`](https://github.com/FISA-Agri-Pay/back-end/blob/dev/service-admin/src/main/java/com/kkpp/admin/bnpl/service/BnplAdminService.java)
----
-
-#### [CI/CD 빌드 최적화 (성능 개선)]
-
-* 기능 설명 :
-  * **이미지 최적화** : 멀티스테이지 빌드 + 경량 런타임 베이스 + 취약 베이스·불필요 패키지 제거 → 이미지 크기·보안 취약점 감소 (Trivy 스캔 취약점 0)
-  * **빌드 속도** : 멀티스테이지로 늘어난 빌드 시간은, Docker 내부 중복 Gradle 빌드 제거(Jenkins가 생성한 JAR만 패키징) + Spring Boot Layered JAR로 의존성 레이어를 Harbor에 캐싱하여 단축
-
-  | 이미지 | 적용 전 | 적용 후 | 비교 |
-  | --- | --- | --- | --- |
-  | 이미지 크기 | 842MB | 694MB | 17.5% 감소 |
-  | 취약점 개수 | 128 | 0 | 100% 감소 |
-  | 레이어 개수 | 48 | 32 | 33.3% 감소 |
-
-  | 파이프라인 | 적용 전 | 적용 후 | 비교 |
-  | --- | --- | --- | --- |
-  | Docker Build & Push | 2분 5초 | 45초 | 약 64% 단축 |
-  | 전체 파이프라인 | 5분 27초 | 3분 10초 | 약 42% 단축 |
-
-* 핵심 코드(스크립트) :
-```dockerfile
-# 기존 Dockerfile
-ARG BUILDER_IMAGE=gradle:8.10.2-jdk21
-ARG RUNTIME_IMAGE=bellsoft/liberica-runtime-container:jre-21-slim-musl
-
-FROM ${BUILDER_IMAGE} AS build
-WORKDIR /workspace
-COPY . . # 전체 소스 복사
-RUN gradle :service-auth:bootJar --no-daemon -x test  # 매번 의존성 처음부터 다운로드
-```
-
-```dockerfile
-# 개선된 Dockerfile
-# JAR은 Jenkins 호스트(./gradlew :service-auth:bootJar)에서 빌드되어 들어옴
-# 이 이미지는 빌드하지 않고 패키징만 한다 (Docker 내 Gradle 재빌드 제거)
-ARG RUNTIME_IMAGE=bellsoft/liberica-runtime-container:jre-21-slim-musl
-
-FROM ${RUNTIME_IMAGE} AS extractor
-WORKDIR /workspace
-COPY build/libs/*.jar app.jar
-RUN java -Djarmode=tools -jar app.jar extract --layers --launcher --destination extracted
-
-FROM ${RUNTIME_IMAGE}
-WORKDIR /app
-# 변경 빈도가 낮은 레이어부터 복사 → 의존성 레이어 캐시 재사용, push 시 app 레이어만 전송
-COPY --from=extractor --chown=65532:65532 /workspace/extracted/dependencies/ ./
-COPY --from=extractor --chown=65532:65532 /workspace/extracted/spring-boot-loader/ ./
-COPY --from=extractor --chown=65532:65532 /workspace/extracted/snapshot-dependencies/ ./
-COPY --from=extractor --chown=65532:65532 /workspace/extracted/application/ ./
-```
-
-```dockerfile
-# AIOps 서비스 (Python) — distroless 런타임
-FROM python:3.11-slim-bookworm AS builder
-
-ENV PYTHONDONTWRITEBYTECODE=1 \
-    PYTHONUNBUFFERED=1 \
-    PIP_NO_CACHE_DIR=1 \
-    PIP_DISABLE_PIP_VERSION_CHECK=1
-
-WORKDIR /app
-
-COPY pyproject.toml README.md ./
-COPY src ./src
-
-RUN python -m pip install --upgrade pip \
-    && python -m pip install --no-compile --target=/app/site-packages .
-
-FROM gcr.io/distroless/python3-debian12:nonroot AS runtime
-
-ENV PYTHONDONTWRITEBYTECODE=1 \
-    PYTHONUNBUFFERED=1 \
-    PYTHONPATH="/app/site-packages"
-
-WORKDIR /app
-
-COPY --from=builder --chown=nonroot:nonroot /app/site-packages /app/site-packages
-
-EXPOSE 8000
-
-CMD ["-m", "uvicorn", "aiops_platform.main:app", "--host", "0.0.0.0", "--port", "8000"]
-```
-
-* 코드 링크(스크립트 링크) :
-  * [`back-end/service-admin/Dockerfile`](https://github.com/FISA-Agri-Pay/back-end/blob/dev/service-admin/Dockerfile)
-  * [`back-end/service-auth/Dockerfile`](https://github.com/FISA-Agri-Pay/back-end/blob/dev/service-auth/Dockerfile)
-  * [`back-end/service-batch/Dockerfile`](https://github.com/FISA-Agri-Pay/back-end/blob/dev/service-batch/Dockerfile)
-  * [`back-end/service-catalog/Dockerfile`](https://github.com/FISA-Agri-Pay/back-end/blob/dev/service-catalog/Dockerfile)
-  * [`back-end/service-core/Dockerfile`](https://github.com/FISA-Agri-Pay/back-end/blob/dev/service-core/Dockerfile)
-  * [`back-end/service-payment/Dockerfile`](https://github.com/FISA-Agri-Pay/back-end/blob/dev/service-payment/Dockerfile)
-  * [`mcp-aiops-backend/Dockerfile`](https://github.com/FISA-Agri-Pay/mcp-aiops-backend/blob/develop/Dockerfile)
-  * Jenkinsfile <!-- TODO: 실제 Jenkinsfile 경로 -->
----
-
-## 4. 레포지토리 구성
-
-| 레포 | 설명 |
+| 영역 | 기술 스택 |
 | --- | --- |
-| [`back-end`](https://github.com/FISA-Agri-Pay/back-end) | 금융 핵심 도메인 백엔드 (Spring Boot 멀티모듈 MSA) |
-| [`front-end`](https://github.com/FISA-Agri-Pay/front-end) | 사용자용 웹앱 프론트엔드 |
-| [`front-end-admin`](https://github.com/FISA-Agri-Pay/front-end-admin) | 관리자용 웹 프론트엔드 |
-| [`ai-prediction-model`](https://github.com/FISA-Agri-Pay/ai-prediction-model) | 시계열 기반 트래픽 예측 모델 · 오토스케일링 정책 · 비교 실험 |
-| [`mcp-aiops-backend`](https://github.com/FISA-Agri-Pay/mcp-aiops-backend) | FastMCP 기반 AIOps 백엔드 |
-| [`infra`](https://github.com/FISA-Agri-Pay/infra) | Terraform 기반 IaC 및 운영 스크립트 |
-| [`git-ops`](https://github.com/FISA-Agri-Pay/git-ops) | ArgoCD GitOps 배포 매니페스트 |
-| [`.github`](https://github.com/FISA-Agri-Pay/.github) | 조직 프로필 · 공통 설정 |
+| Frontend | ![React](https://img.shields.io/badge/React-20232A?style=flat-square&logo=react&logoColor=61DAFB) ![TypeScript](https://img.shields.io/badge/TypeScript-3178C6?style=flat-square&logo=typescript&logoColor=white) ![Vite](https://img.shields.io/badge/Vite-646CFF?style=flat-square&logo=vite&logoColor=white) ![Tailwind CSS](https://img.shields.io/badge/Tailwind%20CSS-06B6D4?style=flat-square&logo=tailwindcss&logoColor=white) ![Zustand](https://img.shields.io/badge/Zustand-764ABC?style=flat-square) |
+| Backend | ![Java 21](https://img.shields.io/badge/Java%2021-007396?style=flat-square&logo=openjdk&logoColor=white) ![Spring Boot 3.5](https://img.shields.io/badge/Spring%20Boot%203.5-6DB33F?style=flat-square&logo=springboot&logoColor=white) ![Spring Security](https://img.shields.io/badge/Spring%20Security-6DB33F?style=flat-square&logo=springsecurity&logoColor=white) ![Spring Data JPA](https://img.shields.io/badge/Spring%20Data%20JPA-6DB33F?style=flat-square&logo=spring&logoColor=white) ![Spring Batch](https://img.shields.io/badge/Spring%20Batch-6DB33F?style=flat-square&logo=spring&logoColor=white) ![FastAPI](https://img.shields.io/badge/FastAPI-009688?style=flat-square&logo=fastapi&logoColor=white) ![FastMCP](https://img.shields.io/badge/FastMCP-111827?style=flat-square) |
+| Test | ![JUnit5](https://img.shields.io/badge/JUnit5-25A162?style=flat-square&logo=junit5&logoColor=white) ![Mockito](https://img.shields.io/badge/Mockito-78A641?style=flat-square) ![JaCoCo](https://img.shields.io/badge/JaCoCo-DC3545?style=flat-square) ![k6](https://img.shields.io/badge/k6-7D64FF?style=flat-square&logo=k6&logoColor=white) |
+| Data / Event | ![PostgreSQL 16](https://img.shields.io/badge/PostgreSQL%2016-4169E1?style=flat-square&logo=postgresql&logoColor=white) ![Redis](https://img.shields.io/badge/Redis-DC382D?style=flat-square&logo=redis&logoColor=white) ![AWS SQS](https://img.shields.io/badge/AWS%20SQS-FF4F8B?style=flat-square&logo=amazonsqs&logoColor=white) |
+| AI / AIOps | ![Python 3.11](https://img.shields.io/badge/Python%203.11-3776AB?style=flat-square&logo=python&logoColor=white) ![PyTorch](https://img.shields.io/badge/PyTorch-EE4C2C?style=flat-square&logo=pytorch&logoColor=white) ![GRU](https://img.shields.io/badge/GRU-7C3AED?style=flat-square) ![vLLM](https://img.shields.io/badge/vLLM-111827?style=flat-square) ![Qwen3-32B](https://img.shields.io/badge/Qwen3--32B-615CED?style=flat-square) ![MCP](https://img.shields.io/badge/MCP-111827?style=flat-square) |
+| Infrastructure | ![AWS](https://img.shields.io/badge/AWS-232F3E?style=flat-square&logo=amazonaws&logoColor=white) ![Terraform](https://img.shields.io/badge/Terraform-7B42BC?style=flat-square&logo=terraform&logoColor=white) ![VMware ESXi](https://img.shields.io/badge/VMware%20ESXi-607078?style=flat-square&logo=vmware&logoColor=white) ![pfSense](https://img.shields.io/badge/pfSense-212121?style=flat-square&logo=pfsense&logoColor=white) ![Kubernetes](https://img.shields.io/badge/Kubernetes-326CE5?style=flat-square&logo=kubernetes&logoColor=white) ![MetalLB](https://img.shields.io/badge/MetalLB-0B7FAB?style=flat-square) ![NGINX Ingress](https://img.shields.io/badge/NGINX%20Ingress-009639?style=flat-square&logo=nginx&logoColor=white) |
+| DevOps | ![Jenkins](https://img.shields.io/badge/Jenkins-D24939?style=flat-square&logo=jenkins&logoColor=white) ![GitHub Actions](https://img.shields.io/badge/GitHub%20Actions-2088FF?style=flat-square&logo=githubactions&logoColor=white) ![Harbor](https://img.shields.io/badge/Harbor-60B932?style=flat-square&logo=harbor&logoColor=white) ![Argo CD](https://img.shields.io/badge/Argo%20CD-EF7B4D?style=flat-square&logo=argo&logoColor=white) ![Docker](https://img.shields.io/badge/Docker-2496ED?style=flat-square&logo=docker&logoColor=white) ![Trivy](https://img.shields.io/badge/Trivy-1904DA?style=flat-square&logo=trivy&logoColor=white) |
+| Observability | ![Prometheus](https://img.shields.io/badge/Prometheus-E6522C?style=flat-square&logo=prometheus&logoColor=white) ![Grafana](https://img.shields.io/badge/Grafana-F46800?style=flat-square&logo=grafana&logoColor=white) ![Loki](https://img.shields.io/badge/Loki-F46800?style=flat-square&logo=grafana&logoColor=white) ![Tempo](https://img.shields.io/badge/Tempo-F46800?style=flat-square&logo=grafana&logoColor=white) ![Alertmanager](https://img.shields.io/badge/Alertmanager-E6522C?style=flat-square&logo=prometheus&logoColor=white) ![OpenTelemetry](https://img.shields.io/badge/OpenTelemetry-000000?style=flat-square&logo=opentelemetry&logoColor=white) ![Fluent Bit](https://img.shields.io/badge/Fluent%20Bit-49BDA5?style=flat-square&logo=fluentbit&logoColor=white) ![Cilium](https://img.shields.io/badge/Cilium-F8C517?style=flat-square&logo=cilium&logoColor=white) ![Hubble](https://img.shields.io/badge/Hubble-F8C517?style=flat-square) |
