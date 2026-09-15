@@ -489,7 +489,7 @@ Mockito와 JUnit으로 단위 테스트를 작성하고 JaCoCo로 Instruction �
 
 | 팀원 | 담당 업무 |
 | --- | --- |
-| **류승환** | SRE Agent 개발 · SQS 비동기 처리 · 내부 LLM 구축 |
+| **류승환** | SRE Agent 개발 · SQS 비동기 처리 · 내부 LLM 구축· Predictive Autoscaling 구축 |
 | **이승준** | 하이브리드 클라우드 설계 · 금융 원장·배치 시스템 구축 · Observability 구축 |
 | **이동욱** | AI 예측 모델 개발 · Predictive Autoscaling 구축 · MCP 기반 AIOps 백엔드 구축 · 백엔드 품질 및 배포 안정화 |
 | **사재헌** | 관리자 대시보드 API 개발 · DB 이중화 및 HA 구축 · 온프레미스 자원 및 로그 모니터링 구축 |
